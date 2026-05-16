@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///C:/Users/Patri/Downloads/salesai-v10.html -->
-<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SalesAI — Simulateur Pro</title>
-<link href="./SalesAI — Simulateur Pro_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0c0b09;
@@ -1642,7 +1642,7 @@ textarea::placeholder { color: var(--muted); }
       <span class="logo-text">SalesAI</span>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
-      <button onclick="showHistory()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.color=&#39;var(--ink)&#39;" onmouseout="this.style.color=&#39;var(--muted)&#39;">Historique</button>
+      <button onclick="showHistory()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">Historique</button>
       <div class="home-badge">Simulateur Pro v5</div>
     </div>
   </nav>
@@ -1665,28 +1665,28 @@ textarea::placeholder { color: var(--muted); }
       <div class="scenarios-label">// Choisir un scénario</div>
 
 
-      <div class="sc" onclick="launch(&#39;cold&#39;)">
+      <div class="sc" onclick="launch('cold')">
         <div class="sc-top"><div class="sc-name">Appel à froid</div><div class="sc-diff d1">Niveau 1 — Débutant</div></div>
         <div class="sc-desc">Marc vient de décrocher. Il a une réunion dans 8 minutes. Décrocher un RDV avant qu'il raccroche. Il coupe si tu pitches trop tôt, si tu es vague ou si tu manques de clarté.</div>
         <div class="sc-trains">Travaille : accroche rapide · qualification · gestion du temps · première impression</div>
         <div class="sc-footer"><div><div class="sc-prospect-name">Marc Delorme</div><div class="sc-prospect-role">DAF · PME Industrie · 80 salariés</div></div><div class="sc-arrow">→</div></div>
       </div>
 
-      <div class="sc" onclick="launch(&#39;demo&#39;)">
-        <div class="sc-top"><div class="sc-name">Démo &amp; Pitch produit</div><div class="sc-diff d2">Niveau 2 — Intermédiaire</div></div>
+      <div class="sc" onclick="launch('demo')">
+        <div class="sc-top"><div class="sc-name">Démo & Pitch produit</div><div class="sc-diff d2">Niveau 2 — Intermédiaire</div></div>
         <div class="sc-desc">Sophie a vu 3 concurrents cette semaine. Elle coupe si tu utilises du jargon vide, si tu ne connais pas ton produit ou si tu promets sans données concrètes.</div>
         <div class="sc-trains">Travaille : pitch structuré · écoute active · différenciation · réponse aux questions techniques</div>
         <div class="sc-footer"><div><div class="sc-prospect-name">Sophie Blanchard</div><div class="sc-prospect-role">DG · Startup Série B · 80 personnes</div></div><div class="sc-arrow">→</div></div>
       </div>
 
-      <div class="sc" onclick="launch(&#39;objection&#39;)">
+      <div class="sc" onclick="launch('objection')">
         <div class="sc-top"><div class="sc-name">Gestion d'objections</div><div class="sc-diff d3">Niveau 3 — Difficile</div></div>
         <div class="sc-desc">Thomas négocie 40M€/an de métier. Il raccroche si tu baisses le prix sans contrepartie, si tu paniques ou si tu dis "je vais voir ce que je peux faire".</div>
         <div class="sc-trains">Travaille : traitement des objections · défense du prix · isoler les blocages · négociation valeur</div>
         <div class="sc-footer"><div><div class="sc-prospect-name">Thomas Renard</div><div class="sc-prospect-role">Dir. Achats · Groupe industriel · 500 pers.</div></div><div class="sc-arrow">→</div></div>
       </div>
 
-      <div class="sc" onclick="launch(&#39;closing&#39;)">
+      <div class="sc" onclick="launch('closing')">
         <div class="sc-top"><div class="sc-name">Closing final</div><div class="sc-diff d4">Niveau 4 — Expert</div></div>
         <div class="sc-desc">Isabelle hésite depuis 3 semaines. Elle met fin si tu forces la décision, si tu minimises sa relation avec son fournisseur actuel ou si tu manques d'empathie.</div>
         <div class="sc-trains">Travaille : empathie · urgence légitime · closing silencieux · confiance humaine</div>
@@ -2927,7 +2927,7 @@ function renderResults(d) {
     </div>
     <div style="display:flex;gap:12px;align-items:center">
       <button class="btn-clear" onclick="clearHistory()">Effacer tout</button>
-      <button class="btn-secondary" onclick="show(&#39;home&#39;)">← Retour</button>
+      <button class="btn-secondary" onclick="show('home')">← Retour</button>
     </div>
   </div>
   <div class="hist-stats" id="hist-stats"></div>
@@ -2957,6 +2957,5 @@ function renderResults(d) {
   </div>
 </div>
 
-
-
-</body></html>
+</body>
+</html>
