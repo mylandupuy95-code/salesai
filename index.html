@@ -1625,6 +1625,22 @@ textarea::placeholder { color: var(--muted); }
   .hist-stats { grid-template-columns: 1fr 1fr; }
   #history { padding: 40px 24px; }
 }
+/* MANAGER TABS */
+.mgr-tab {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  padding: 7px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.mgr-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+.mgr-tab:hover:not(.active) { color: var(--ink); border-color: var(--ink2); }
 </style>
 </head>
 <body>
@@ -1635,7 +1651,179 @@ textarea::placeholder { color: var(--muted); }
 </div>
 
 <!-- ════════ HOME ════════ -->
-<div id="home">
+<!-- LANDING -->
+<div id="landing" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg)">
+  <nav style="padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#000">S</div>
+      <span style="font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--ink)">SalesAI</span>
+    </div>
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:1px solid var(--border2);padding:5px 14px">Choisir votre espace</div>
+  </nav>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="width:100%;max-width:780px">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;text-align:center">Simulateur d'entraînement commercial IA</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,72px);font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:16px;text-align:center">Qui êtes-<br><em style="font-style:italic;color:var(--accent)">vous ?</em></div>
+      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:48px;line-height:1.7">Choisissez votre espace pour accéder à l'expérience adaptée à votre rôle.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border)">
+        <div onclick="enterIndividual()" style="background:var(--s1);padding:40px;cursor:pointer;position:relative" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='var(--s1)'">
+          <div style="position:absolute;top:20px;right:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--green);color:var(--green)">Gratuit</div>
+          <div style="font-size:36px;margin-bottom:20px">⚡</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Mode<br>Individuel</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px">Entraînez-vous seul face à des prospects IA ultra-réalistes.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> 4 scénarios progressifs</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Débriefing expert</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Historique et progression</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Replay du bon choix</div>
+          </div>
+          <div style="background:var(--accent);color:#000;padding:14px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase">Accéder →</div>
+        </div>
+        <div onclick="enterManager()" style="background:var(--s2);padding:40px;cursor:pointer;position:relative;border-left:3px solid var(--accent)" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='var(--s2)'">
+          <div style="position:absolute;top:20px;right:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--muted);color:var(--muted)">Pro</div>
+          <div style="font-size:36px;margin-bottom:20px">👥</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Mode<br>Manager</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px">Créez des scénarios sur mesure, invitez vos commerciaux et suivez leur progression.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--accent)">✓</span> Tableau de bord équipe</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--accent)">✓</span> Scénarios personnalisés</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--accent)">✓</span> Invitation des commerciaux</div>
+            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--accent)">✓</span> Scores en temps réel</div>
+          </div>
+          <div style="background:var(--ink);color:var(--bg);padding:14px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase">Accéder →</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--muted)">
+        Vous êtes commercial invité par votre manager ?
+        <span onclick="enterCommercial()" style="color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:6px">Accéder avec votre code équipe →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGER SETUP -->
+<div id="manager-setup" style="display:none;min-height:100vh;flex-direction:column">
+  <nav style="padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--s1)">
+    <span style="font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--ink)">SalesAI</span>
+    <button onclick="showScreen('landing')" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+  </nav>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="max-width:520px;width:100%">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:16px">// Configuration Manager</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:40px">Votre<br><em style="font-style:italic;color:var(--accent)">espace.</em></div>
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Votre prénom</div>
+      <input id="mgr-name" type="text" placeholder="ex: Thomas" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:16px">
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Nom de votre équipe</div>
+      <input id="mgr-team" type="text" placeholder="ex: Équipe Commerciale Sud" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:16px">
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Votre secteur d'activité</div>
+      <input id="mgr-sector" type="text" placeholder="ex: Distribution alimentaire, SaaS B2B..." style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:24px">
+      <button onclick="setupManager()" style="width:100%;background:var(--accent);color:#000;border:none;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:10px">Créer mon espace →</button>
+      <button onclick="showScreen('landing')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGER DASHBOARD -->
+<div id="manager-dashboard" style="display:none;min-height:100vh;flex-direction:column">
+  <nav style="background:var(--s1);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:28px;height:28px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:700;color:#000">S</div>
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Manager</div>
+        <div id="mgr-display-name" style="font-size:13px;font-weight:500;color:var(--ink)">—</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="mgr-tab active" id="tab-dashboard" onclick="showMgrTab('dashboard')">Équipe</button>
+      <button class="mgr-tab" id="tab-scenarios" onclick="showMgrTab('scenarios')">Scénarios</button>
+      <button class="mgr-tab" id="tab-invite" onclick="showMgrTab('invite')">Inviter</button>
+      <button class="mgr-tab" onclick="showScreen('landing')" style="opacity:.5">←</button>
+    </div>
+  </nav>
+  <div id="mgr-tab-dashboard" style="padding:40px 48px">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;line-height:.95;letter-spacing:-1px;color:var(--ink);margin-bottom:32px">Mon <em style="font-style:italic;color:var(--accent)">équipe.</em></div>
+    <div id="mgr-team-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:32px"></div>
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Commerciaux</div>
+    <div id="mgr-team-table" style="border:1px solid var(--border)"></div>
+  </div>
+  <div id="mgr-tab-scenarios" style="display:none;padding:40px 48px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;line-height:.95;letter-spacing:-1px;color:var(--ink)">Scénarios <em style="font-style:italic;color:var(--accent)">sur mesure.</em></div>
+      <button onclick="openCreateScenario()" style="background:var(--accent);color:#000;border:none;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer">+ Créer</button>
+    </div>
+    <div id="mgr-scenarios-list"></div>
+  </div>
+  <div id="mgr-tab-invite" style="display:none;padding:40px 48px;max-width:600px">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;line-height:.95;letter-spacing:-1px;color:var(--ink);margin-bottom:32px">Inviter mon <em style="font-style:italic;color:var(--accent)">équipe.</em></div>
+    <div style="background:var(--s2);border:1px solid var(--border2);border-left:3px solid var(--accent);padding:24px;margin-bottom:24px">
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Code équipe</div>
+      <div id="team-code-display" style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:var(--accent);letter-spacing:8px;margin:8px 0">—</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6">Vos commerciaux entrent ce code pour rejoindre votre équipe.</div>
+    </div>
+    <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Lien direct</div>
+    <div id="invite-link" style="font-size:11px;color:var(--ink2);padding:12px 16px;background:var(--s1);border:1px solid var(--border);word-break:break-all;margin-bottom:10px;line-height:1.6">—</div>
+    <button onclick="copyInviteLink()" style="background:transparent;border:1px solid var(--border2);color:var(--accent);padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-bottom:24px">Copier le lien</button>
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Message prêt à envoyer</div>
+    <div id="invite-message" style="background:var(--s1);border:1px solid var(--border);padding:20px;font-size:12px;color:var(--ink2);line-height:1.8">—</div>
+  </div>
+</div>
+
+<!-- COMMERCIAL ENTRY -->
+<div id="commercial-entry" style="display:none;min-height:100vh;flex-direction:column">
+  <nav style="padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--s1)">
+    <span style="font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--ink)">SalesAI</span>
+    <button onclick="showScreen('landing')" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+  </nav>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="max-width:420px;width:100%;text-align:center">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:32px">Code<br><em style="font-style:italic;color:var(--accent)">équipe.</em></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:28px;line-height:1.7">Entrez le code fourni par votre manager pour rejoindre votre équipe.</div>
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;text-align:left">Votre prénom</div>
+      <input id="commercial-name" type="text" placeholder="ex: Marie" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:16px;text-align:left">
+      <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;text-align:left">Code équipe</div>
+      <input id="team-code-input" type="text" placeholder="TEAM-XXXX" maxlength="9" oninput="this.value=this.value.toUpperCase()" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:16px;font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--accent);outline:none;text-align:center;letter-spacing:8px;margin-bottom:20px;text-transform:uppercase">
+      <button onclick="joinTeam()" style="width:100%;background:var(--accent);color:#000;border:none;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer;margin-bottom:10px">Rejoindre l'équipe →</button>
+      <button onclick="showScreen('landing')" style="width:100%;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE SCENARIO MODAL -->
+<div id="create-scenario-modal" style="position:fixed;inset:0;background:rgba(12,11,9,.97);display:none;align-items:center;justify-content:center;z-index:990;padding:40px;overflow-y:auto">
+  <div style="max-width:580px;width:100%;background:var(--s1);border:1px solid var(--border2)">
+    <div style="background:var(--s2);padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent)">Créer un scénario personnalisé</div>
+      <button onclick="closeCreateScenario()" style="background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:28px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Nom du scénario</div>
+        <input id="sc-name" type="text" placeholder="ex: Appel directeur achat grande surface" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);outline:none">
+      </div>
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Profil du prospect</div>
+        <input id="sc-prospect" type="text" placeholder="ex: Directeur Achats, 50 ans, grande distribution" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);outline:none">
+      </div>
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Ce que vend votre équipe</div>
+        <input id="sc-product" type="text" placeholder="ex: Jus de fruits premium, 3-12€/btl" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);outline:none">
+      </div>
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Objectif du commercial</div>
+        <input id="sc-goal" type="text" placeholder="ex: Décrocher un RDV de dégustation" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);outline:none">
+      </div>
+      <div>
+        <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Objections typiques</div>
+        <textarea id="sc-objections" placeholder="ex: On a déjà des fournisseurs / Vos prix sont trop élevés..." style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink);outline:none;resize:vertical;min-height:80px;line-height:1.6"></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="sc-generate-btn" onclick="generateScenario()" style="flex:1;background:var(--accent);color:#000;border:none;padding:14px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer">Générer le scénario IA →</button>
+        <button onclick="closeCreateScenario()" style="background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer">Annuler</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div id="home">
   <nav class="home-nav">
     <div class="logo-mark">
       <div class="logo-icon">S</div>
@@ -2038,21 +2226,30 @@ const MAX_MSG    = 20;
 /* ════════════════════════════════
    NAVIGATION
 ════════════════════════════════ */
-function show(id) {
-  document.getElementById('home').style.display    = 'none';
-  document.getElementById('sim').style.display     = 'none';
-  document.getElementById('results').style.display = 'none';
-  document.getElementById('history').style.display = 'none';
-  if (id === 'home')    document.getElementById('home').style.display    = 'grid';
-  if (id === 'sim')     document.getElementById('sim').style.display     = 'flex';
-  if (id === 'results') document.getElementById('results').style.display = 'flex';
-  if (id === 'history') document.getElementById('history').style.display = 'block';
+var ALL_SCREENS = ['landing','home','sim','results','history','manager-setup','manager-dashboard','commercial-entry'];
+
+function showScreen(id) {
+  ALL_SCREENS.forEach(function(s) {
+    var el = document.getElementById(s);
+    if (!el) return;
+    el.style.display = 'none';
+  });
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (id === 'home') el.style.display = 'grid';
+  else if (id === 'sim') el.style.display = 'flex';
+  else if (id === 'results') el.style.display = 'flex';
+  else if (id === 'manager-setup') el.style.display = 'flex';
+  else if (id === 'commercial-entry') el.style.display = 'flex';
+  else el.style.display = 'block';
   window.scrollTo(0, 0);
 }
 
+function show(id) { showScreen(id); }
+
 function goHome() {
   stopTimer();
-  show('home');
+  show('landing');
 }
 
 /* ════════════════════════════════
