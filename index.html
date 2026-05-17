@@ -2881,6 +2881,184 @@ function renderResults(d) {
 
   show('results');
 }
+/* MANAGER */
+var mgrData={name:'',teamName:'',sector:'',teamCode:'',members:[]};
+var commercialData={name:'',teamCode:'',isTeamMember:false};
+
+function enterIndividual(){showScreen('home');}
+
+function enterManager(){
+  try{
+    var s=JSON.parse(localStorage.getItem('salesai_manager')||'null');
+    if(s&&s.teamCode){mgrData=s;loadMgrDashboard();showScreen('manager-dashboard');return;}
+  }catch(e){}
+  showScreen('manager-setup');
+}
+
+function enterCommercial(){showScreen('commercial-entry');}
+
+function genCode(){
+  var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r='TEAM-';
+  for(var i=0;i<4;i++)r+=c[Math.floor(Math.random()*c.length)];
+  return r;
+}
+
+function setupManager(){
+  var n=(document.getElementById('mgr-name').value||'').trim();
+  var t=(document.getElementById('mgr-team').value||'').trim();
+  var s=(document.getElementById('mgr-sector').value||'').trim();
+  if(!n||!t){alert('Prénom et nom équipe obligatoires.');return;}
+  mgrData={name:n,teamName:t,sector:s,teamCode:genCode(),members:[]};
+  localStorage.setItem('salesai_manager',JSON.stringify(mgrData));
+  loadMgrDashboard();
+  showScreen('manager-dashboard');
+}
+
+function loadMgrDashboard(){
+  document.getElementById('mgr-display-name').textContent=mgrData.name+' · '+mgrData.teamName;
+  renderTeamDashboard();
+}
+
+function showMgrTab(tab){
+  ['dashboard','scenarios','invite'].forEach(function(t){
+    var el=document.getElementById('mgr-tab-'+t);
+    var btn=document.getElementById('tab-'+t);
+    if(el)el.style.display='none';
+    if(btn)btn.classList.remove('active');
+  });
+  var el=document.getElementById('mgr-tab-'+tab);
+  var btn=document.getElementById('tab-'+tab);
+  if(el)el.style.display='block';
+  if(btn)btn.classList.add('active');
+  if(tab==='invite')renderInviteTab();
+  if(tab==='scenarios')renderScenariosTab();
+  if(tab==='dashboard')renderTeamDashboard();
+}
+
+function renderTeamDashboard(){
+  var key='salesai_team_'+mgrData.teamCode;
+  var members=[];
+  try{members=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  var total=members.reduce(function(s,m){return s+(m.sessions||0);},0);
+  var avg=members.length>0?Math.round(members.reduce(function(s,m){return s+(m.avgScore||0);},0)/members.length):0;
+  var best=members.length>0?Math.max.apply(null,members.map(function(m){return m.bestScore||0;})):0;
+  var se=document.getElementById('mgr-team-stats');
+  if(se)se.innerHTML=mgrStat(members.length,'Commerciaux')+mgrStat(total,'Sessions')+mgrStat(avg,'Score moyen')+mgrStat(best,'Meilleur');
+  var te=document.getElementById('mgr-team-table');
+  if(!te)return;
+  if(members.length===0){te.innerHTML='<div style="text-align:center;padding:48px;font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase">Aucun commercial — partagez votre code</div>';return;}
+  function sc(v){return v>=70?'var(--green)':v>=45?'var(--accent)':'var(--red)';}
+  var h='<div style="display:grid;grid-template-columns:1fr 80px 80px 80px 120px;padding:10px 20px;background:var(--s2);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)"><div>Commercial</div><div>Sessions</div><div>Moy.</div><div>Meilleur</div><div>Dernière session</div></div>';
+  var rows=members.map(function(m){return '<div style="display:grid;grid-template-columns:1fr 80px 80px 80px 120px;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center"><div style="font-size:13px;color:var(--ink)">'+m.name+'</div><div style="color:var(--muted)">'+( m.sessions||0)+'</div><div style="font-family:Cormorant Garamond,serif;font-size:20px;color:'+sc(m.avgScore||0)+'">'+( m.avgScore||0)+'</div><div style="font-family:Cormorant Garamond,serif;font-size:20px;color:var(--green)">'+( m.bestScore||0)+'</div><div style="font-size:10px;color:var(--muted)">'+(m.lastSession||'—')+'</div></div>';}).join('');
+  te.innerHTML=h+rows;
+}
+
+function mgrStat(val,label){return '<div style="background:var(--s1);padding:20px"><div style="font-family:Cormorant Garamond,serif;font-size:36px;font-weight:600;color:var(--accent);line-height:1">'+val+'</div><div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px">'+label+'</div></div>';}
+
+function renderInviteTab(){
+  var code=mgrData.teamCode||'—';
+  var cd=document.getElementById('team-code-display');
+  var il=document.getElementById('invite-link');
+  var im=document.getElementById('invite-message');
+  if(cd)cd.textContent=code;
+  var link=window.location.href.split('?')[0]+'?team='+code;
+  if(il)il.textContent=link;
+  if(im)im.innerHTML='Bonjour,<br><br>Rejoignez notre espace SalesAI.<br><br>Lien : <strong>'+link+'</strong><br>Code : <strong>'+code+'</strong><br><br>Bonne simulation !<br>'+mgrData.name;
+}
+
+function copyInviteLink(){
+  var link=window.location.href.split('?')[0]+'?team='+mgrData.teamCode;
+  navigator.clipboard.writeText(link).then(function(){alert('Lien copié !');}).catch(function(){alert('Lien : '+link);});
+}
+
+function renderScenariosTab(){
+  var el=document.getElementById('mgr-scenarios-list');
+  if(!el)return;
+  var customs=getCustomScenarios();
+  if(customs.length===0){el.innerHTML='<div style="text-align:center;padding:48px;font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;border:1px dashed var(--border)">Aucun scénario — créez votre premier</div>';return;}
+  el.innerHTML=customs.map(function(sc,i){return '<div style="background:var(--s1);border:1px solid var(--border);padding:20px 24px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:16px"><div><div style="font-family:Cormorant Garamond,serif;font-size:18px;color:var(--ink);margin-bottom:4px">'+sc.name+'</div><div style="font-size:10px;color:var(--muted)">'+sc.prospectProfile+' · '+sc.goal+'</div></div><div style="display:flex;gap:8px"><button onclick="launchCustomScenario('+i+')" style="background:var(--accent);color:#000;border:none;padding:8px 16px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">Lancer</button><button onclick="deleteCustomScenario('+i+')" style="background:transparent;color:var(--red);border:1px solid var(--red);padding:8px 12px;font-family:JetBrains Mono,monospace;font-size:9px;cursor:pointer;opacity:.6">✕</button></div></div>';}).join('');
+}
+
+function getCustomScenarios(){try{return JSON.parse(localStorage.getItem('salesai_custom_scenarios')||'[]');}catch(e){return[];}}
+
+function openCreateScenario(){document.getElementById('create-scenario-modal').classList.add('visible');}
+function closeCreateScenario(){document.getElementById('create-scenario-modal').classList.remove('visible');}
+
+async function generateScenario(){
+  var name=(document.getElementById('sc-name').value||'').trim();
+  var prospect=(document.getElementById('sc-prospect').value||'').trim();
+  var product=(document.getElementById('sc-product').value||'').trim();
+  var goal=(document.getElementById('sc-goal').value||'').trim();
+  var objections=(document.getElementById('sc-objections').value||'').trim();
+  if(!name||!prospect||!goal){alert('Nom, profil et objectif obligatoires.');return;}
+  var btn=document.getElementById('sc-generate-btn');
+  btn.textContent='Génération...';btn.disabled=true;
+  var prompt='Génère un system prompt pour un simulateur de vente IA.\nProspect : '+prospect+'\nProduit : '+(product||'non précisé')+'\nObjections : '+(objections||'prix, timing')+'\nSecteur : '+(mgrData.sector||'non précisé')+'\nSystem prompt réaliste en français, 300 mots max, commence par le personnage, inclus RACCROCHE: raison si mauvaise vente.';
+  var generatedPrompt='';
+  try{generatedPrompt=await claude([{role:'user',content:prompt}],'Tu crées des personas commerciaux. Réponds uniquement avec le system prompt.');}
+  catch(e){generatedPrompt='Tu es '+prospect+'. Produit : '+(product||'solution proposée')+'. Raccroches si vague ou répétitif. RACCROCHE: raison si mauvaise vente. 3 phrases max.';}
+  var customs=getCustomScenarios();
+  customs.push({name:name,prospectProfile:prospect,product:product,goal:goal,objections:objections,systemPrompt:generatedPrompt,createdAt:new Date().toLocaleDateString('fr-FR')});
+  localStorage.setItem('salesai_custom_scenarios',JSON.stringify(customs));
+  btn.textContent='Générer le scénario IA →';btn.disabled=false;
+  closeCreateScenario();renderScenariosTab();
+}
+
+function deleteCustomScenario(idx){
+  var c=getCustomScenarios();c.splice(idx,1);
+  localStorage.setItem('salesai_custom_scenarios',JSON.stringify(c));
+  renderScenariosTab();
+}
+
+function launchCustomScenario(idx){
+  var customs=getCustomScenarios();
+  var sc=customs[idx];if(!sc)return;
+  currentKey='custom';
+  current={name:sc.name,prospect:{name:sc.prospectProfile.split(',')[0].trim(),role:sc.prospectProfile,av:sc.prospectProfile.substring(0,2).toUpperCase()},brief:[{k:'Profil',v:sc.prospectProfile},{k:'Produit',v:sc.product||'—'},{k:'Objectif',v:sc.goal}],tips:['Adaptez votre pitch au profil exact','Préparez les objections connues','Restez dans le contexte secteur'],systemPrompt:sc.systemPrompt,objective:sc.goal,context:'Scénario personnalisé — '+sc.prospectProfile,killwords:(sc.objections||'').split('/').slice(0,3).map(function(s){return s.trim();}).filter(Boolean)};
+  userProduct=sc.product||'';
+  history=[];conversation=[];msgCount=0;
+  scores={accroche:30,ecoute:30,argumentation:30,objections:30,closing:30};
+  mood={interet:25,confiance:20,urgence:15};currentDiff=2;
+  showScreen('home');
+  setTimeout(function(){showObjective();},50);
+}
+
+function joinTeam(){
+  var name=(document.getElementById('commercial-name').value||'').trim();
+  var code=(document.getElementById('team-code-input').value||'').trim().toUpperCase();
+  if(!name||!code){alert('Prénom et code équipe obligatoires.');return;}
+  commercialData={name:name,teamCode:code,isTeamMember:true};
+  localStorage.setItem('salesai_commercial',JSON.stringify(commercialData));
+  showScreen('home');
+}
+
+function syncScoreToTeam(data){
+  if(!commercialData.isTeamMember||!commercialData.teamCode)return;
+  var key='salesai_team_'+commercialData.teamCode;
+  var members=[];
+  try{members=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  var idx=-1;
+  for(var i=0;i<members.length;i++){if(members[i].name===commercialData.name){idx=i;break;}}
+  var sc=idx>=0?(members[idx].scores||[]):[];
+  sc.unshift(data.score_global);if(sc.length>20)sc=sc.slice(0,20);
+  var member={name:commercialData.name,sessions:(idx>=0?(members[idx].sessions||0):0)+1,avgScore:Math.round(sc.reduce(function(s,v){return s+v;},0)/sc.length),bestScore:Math.max.apply(null,sc),scores:sc,lastSession:new Date().toLocaleDateString('fr-FR')};
+  if(idx>=0)members[idx]=member;else members.push(member);
+  localStorage.setItem(key,JSON.stringify(members));
+}
+
+window.addEventListener('load',function(){
+  try{
+    var params=new URLSearchParams(window.location.search);
+    var teamCode=params.get('team');
+    if(teamCode){
+      var inp=document.getElementById('team-code-input');
+      if(inp)inp.value=teamCode.toUpperCase();
+      showScreen('commercial-entry');return;
+    }
+  }catch(e){}
+  try{var s=JSON.parse(localStorage.getItem('salesai_commercial')||'null');if(s&&s.isTeamMember)commercialData=s;}catch(e){}
+  showScreen('landing');
+});
 </script>
 
 <!-- OBJECTIVE OVERLAY -->
