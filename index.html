@@ -1641,6 +1641,43 @@ textarea::placeholder { color: var(--muted); }
 
 .mgr-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 .mgr-tab:hover:not(.active) { color: var(--ink); border-color: var(--ink2); }
+/* MODE VOCAL */
+.voice-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  padding: 0 16px;
+  height: 48px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.voice-btn:hover { border-color: var(--accent); color: var(--accent); }
+.voice-btn.listening { background: rgba(184,64,64,.1); border-color: var(--red); color: var(--red); animation: blink2 1s infinite; }
+.voice-btn.speaking { background: rgba(74,154,106,.1); border-color: var(--green); color: var(--green); }
+
+.voice-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.voice-status {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 6px;
+  min-height: 24px;
+}
 </style>
 </head>
 <body>
@@ -1923,6 +1960,11 @@ textarea::placeholder { color: var(--muted); }
           <textarea id="txt" placeholder="Répondez naturellement..." rows="2" onkeydown="onKey(event)"></textarea>
           <button class="btn-send" id="btn-send" onclick="send()">Envoyer</button>
           <button class="btn-end" onclick="endSim()">Terminer</button>
+          <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
+  <div class="voice-dot"></div>
+  Mode appel
+</button>
+<div class="voice-status" id="voice-status"></div>
         </div>
       </div>
     </div>
@@ -3256,6 +3298,193 @@ window.addEventListener('load',function(){
   try{var s=JSON.parse(localStorage.getItem('salesai_commercial')||'null');if(s&&s.isTeamMember)commercialData=s;}catch(e){}
   showScreen('landing');
 });
+/* ════════════════════════════════
+   MODE VOCAL
+════════════════════════════════ */
+var ELEVEN_KEY = 'sk_cdf1528b7fa4f09f5440fa7e49222e61b80c262447654b33';
+var ELEVEN_VOICE_ID = 'TX3LPaxmHKxFdv7VOQHJ'; // Voix masculine française
+var voiceActive = false;
+var recognition = null;
+var currentAudio = null;
+
+function toggleVoice() {
+  if (!voiceActive) {
+    startVoiceMode();
+  } else {
+    stopVoiceMode();
+  }
+}
+
+function startVoiceMode() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Le mode vocal nécessite Google Chrome. Ouvrez le simulateur dans Chrome.');
+    return;
+  }
+  voiceActive = true;
+  var btn = document.getElementById('voice-btn');
+  btn.classList.add('listening');
+  btn.innerHTML = '<div class="voice-dot"></div> Écoute...';
+  document.getElementById('voice-status').textContent = 'Parlez maintenant — le prospect vous écoute';
+  startListening();
+}
+
+function stopVoiceMode() {
+  voiceActive = false;
+  if (recognition) { recognition.stop(); recognition = null; }
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  var btn = document.getElementById('voice-btn');
+  btn.className = 'voice-btn';
+  btn.innerHTML = '<div class="voice-dot"></div> Mode appel';
+  document.getElementById('voice-status').textContent = '';
+}
+
+function startListening() {
+  if (!voiceActive) return;
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    var transcript = event.results[0][0].transcript;
+    document.getElementById('txt').value = transcript;
+    document.getElementById('voice-status').textContent = 'Vous : "' + transcript + '"';
+    sendVoice(transcript);
+  };
+
+  recognition.onerror = function(e) {
+    if (voiceActive) {
+      document.getElementById('voice-status').textContent = 'Erreur micro — réessayez';
+      setTimeout(startListening, 1000);
+    }
+  };
+
+  recognition.onend = function() {
+    // Ne relance pas tant que le prospect parle
+  };
+
+  recognition.start();
+  var btn = document.getElementById('voice-btn');
+  btn.className = 'voice-btn listening';
+  btn.innerHTML = '<div class="voice-dot"></div> Écoute...';
+}
+
+async function sendVoice(text) {
+  if (!text || !voiceActive) return;
+
+  var btn = document.getElementById('voice-btn');
+  btn.className = 'voice-btn speaking';
+  btn.innerHTML = '<div class="voice-dot"></div> Prospect parle...';
+  document.getElementById('btn-send').disabled = true;
+
+  // Envoie le message normalement
+  document.getElementById('txt').value = text;
+  addMsg(text, 'u');
+  msgCount++;
+  updateCounter();
+  conversation.push({ role: 'user', content: text + '\n\n[Mode vocal - meme comportement]' });
+
+  if (msgCount >= MAX_MSG) {
+    addSys("Limite atteinte — génération du débriefing...");
+    setTimeout(endSim, 1200);
+    return;
+  }
+
+  showTyping();
+
+  try {
+    var reply = await claude(conversation, current.systemPrompt);
+    removeTyping();
+
+    // Vérifier raccroché
+    if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:')) {
+      var reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').trim();
+      addMsg(reason, 'p');
+      conversation.push({ role: 'assistant', content: reply });
+      await speakText(reason);
+      stopVoiceMode();
+      setTimeout(function() { triggerCallEnd('lost', reason); }, 500);
+      return;
+    }
+
+    if (reply.startsWith('RDV OBTENU:')) {
+      var detail = reply.replace('RDV OBTENU:', '').trim();
+      addMsg(detail, 'p');
+      conversation.push({ role: 'assistant', content: reply });
+      await speakText(detail);
+      stopVoiceMode();
+      setTimeout(function() { triggerCallEnd('rdv', detail); }, 500);
+      return;
+    }
+
+    if (reply.startsWith('DEAL SIGNÉ:') || reply.startsWith('DEAL AVANCÉ:') || reply.startsWith('DEAL SIGNE:')) {
+      var detail2 = reply.replace('DEAL SIGNÉ:', '').replace('DEAL AVANCÉ:', '').replace('DEAL SIGNE:', '').trim();
+      addMsg(detail2, 'p');
+      conversation.push({ role: 'assistant', content: reply });
+      await speakText(detail2);
+      stopVoiceMode();
+      setTimeout(function() { triggerCallEnd('won', detail2); }, 500);
+      return;
+    }
+
+    addMsg(reply, 'p');
+    conversation.push({ role: 'assistant', content: reply });
+
+    // Faire parler le prospect
+    await speakText(reply);
+
+    // Relancer l'écoute après que le prospect ait fini de parler
+    if (voiceActive) {
+      document.getElementById('voice-status').textContent = 'Parlez maintenant...';
+      setTimeout(startListening, 500);
+    }
+
+  } catch(e) {
+    removeTyping();
+    addMsg("Désolé, j'ai une urgence.", 'p');
+    if (voiceActive) setTimeout(startListening, 1000);
+  }
+
+  document.getElementById('btn-send').disabled = false;
+  document.getElementById('txt').value = '';
+}
+
+async function speakText(text) {
+  return new Promise(function(resolve) {
+    if (!voiceActive) { resolve(); return; }
+
+    var btn = document.getElementById('voice-btn');
+    btn.className = 'voice-btn speaking';
+    btn.innerHTML = '<div class="voice-dot"></div> Prospect parle...';
+    document.getElementById('voice-status').textContent = current.prospect.name + ' parle...';
+
+    fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVEN_VOICE_ID, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': ELEVEN_KEY
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    })
+    .then(function(r) { return r.blob(); })
+    .then(function(blob) {
+      var url = URL.createObjectURL(blob);
+      currentAudio = new Audio(url);
+      currentAudio.onended = function() {
+        URL.revokeObjectURL(url);
+        resolve();
+      };
+      currentAudio.onerror = function() { resolve(); };
+      currentAudio.play();
+    })
+    .catch(function() { resolve(); });
+  });
+}
 </script>
 
 <!-- OBJECTIVE OVERLAY -->
