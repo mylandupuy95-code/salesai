@@ -1610,37 +1610,66 @@ textarea::placeholder { color: var(--muted); }
 .hd-icon { flex-shrink: 0; font-size: 14px; }
 
 @media(max-width:768px){
-  .home-body { grid-template-columns:1fr; }
-  .home-left { padding:48px 24px; }
-  .home-right { padding:32px 24px; }
-  .home-nav, .home-footer { padding:20px 24px; }
+  /* HOME */
+  .home-grid { grid-template-columns:1fr; }
+  .home-left { padding:40px 24px; min-height:50vh; }
+  .home-left::after { display:none; }
+  .home-right { padding:28px 20px; }
+  .home-nav, .home-footer { padding:16px 20px; }
+
+  /* SIMULATION */
   .sim-body { grid-template-columns:1fr; }
   .sim-side { display:none; }
-  .chat-log { padding:20px; }
-  .chat-input { padding:16px 20px; }
-  #results { padding:40px 24px; }
-  .res-grid, .rd-cols { grid-template-columns:1fr; }
-  .hist-row { grid-template-columns: 140px 100px 70px 1fr; }
-  .hist-row > *:nth-child(n+5) { display: none; }
-  .hist-stats { grid-template-columns: 1fr 1fr; }
-  #history { padding: 40px 24px; }
-}
-/* MANAGER TABS */
-.mgr-tab {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border2);
-  padding: 7px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all .2s;
-}
+  .sim-top { padding:10px 16px; flex-wrap:wrap; gap:8px; }
+  .chat-log { padding:16px; }
+  .chat-input { padding:12px 16px; }
+  .input-row { flex-wrap:wrap; gap:8px; }
+  .input-row textarea { min-height:44px; font-size:13px; }
+  .btn-send, .btn-end { height:44px; padding:0 14px; font-size:9px; }
+  .voice-btn { height:44px; padding:0 12px; font-size:9px; width:100%; justify-content:center; }
 
-.mgr-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
-.mgr-tab:hover:not(.active) { color: var(--ink); border-color: var(--ink2); }
+  /* RESULTS */
+  #results { padding:32px 20px; }
+  .res-grid { grid-template-columns:1fr; }
+  .rd-cols { grid-template-columns:1fr; }
+  .res-title { font-size:36px; }
+
+  /* HISTORY */
+  #history { padding:32px 20px; }
+  .hist-stats { grid-template-columns:1fr 1fr; }
+  .hist-row { grid-template-columns:1fr 60px 60px 80px; font-size:10px; padding:10px 12px; }
+  .hist-row > *:nth-child(n+5) { display:none; }
+  .hist-row.header > *:nth-child(n+5) { display:none; }
+
+  /* LANDING */
+  .mode-grid { grid-template-columns:1fr; }
+  #landing .landing-body { padding:28px 20px; }
+  #landing nav { padding:16px 20px; }
+  .landing-main-title { font-size:40px; }
+
+  /* MANAGER */
+  .mgr-content { padding:24px 20px; }
+  .mgr-stats-grid { grid-template-columns:1fr 1fr; }
+  .mgr-table-header { grid-template-columns:1fr 70px 70px 70px; }
+  .mgr-table-row { grid-template-columns:1fr 70px 70px 70px; }
+  .mgr-table-header > *:last-child,
+  .mgr-table-row > *:last-child { display:none; }
+  .mgr-nav { padding:10px 16px; }
+  .mgr-nav-tabs { flex-wrap:wrap; gap:4px; }
+  .mgr-tab { padding:5px 10px; font-size:8px; }
+
+  /* OBJECTIVE OVERLAY */
+  .obj-overlay { padding:20px; }
+  .obj-body { padding:20px; }
+  .obj-scenario-name { font-size:22px; }
+
+  /* REPLAY MODAL */
+  .replay-modal { padding:20px; }
+  .replay-body { padding:18px; }
+
+  /* TIMER */
+  .timer-wrap { display:none; }
+}
 /* MODE VOCAL */
 .voice-btn {
   display: flex;
