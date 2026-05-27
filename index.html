@@ -3511,21 +3511,72 @@ async function sendVoice(text) {
 async function speakText(text) {
   return new Promise(function(resolve) {
     if (!voiceActive) { resolve(); return; }
+
     var btn = document.getElementById('voice-btn');
     btn.className = 'voice-btn speaking';
     btn.innerHTML = '<div class="voice-dot"></div> Prospect parle...';
     document.getElementById('voice-status').textContent = current.prospect.name + ' parle...';
+
     var synth = window.speechSynthesis;
+
+    // Annuler toute synthèse en cours
+    synth.cancel();
+
     var utt = new SpeechSynthesisUtterance(text);
     utt.lang = 'fr-FR';
-    utt.rate = 0.95;
-    utt.pitch = 1;
-    var voices = synth.getVoices();
-    var frVoice = voices.find(function(v) { return v.lang.startsWith('fr'); });
-    if (frVoice) utt.voice = frVoice;
-    utt.onend = function() { resolve(); };
-    utt.onerror = function() { resolve(); };
-    synth.speak(utt);
+    utt.rate = 0.88;
+    utt.pitch = 0.95;
+    utt.volume = 1;
+
+    // Chercher la meilleure voix française disponible
+    function getBestVoice() {
+      var voices = synth.getVoices();
+      // Priorité : voix française naturelle
+      var preferred = [
+        'Thomas', 'Amelie', 'Monica', 'Google français',
+        'Microsoft Paul', 'Microsoft Julie'
+      ];
+      for (var i = 0; i < preferred.length; i++) {
+        var v = voices.find(function(v) { return v.name.includes(preferred[i]); });
+        if (v) return v;
+      }
+      // Fallback : n'importe quelle voix fr
+      return voices.find(function(v) { return v.lang.startsWith('fr'); }) || null;
+    }
+
+    // Les voix peuvent ne pas être chargées immédiatement
+    var voice = getBestVoice();
+    if (voice) {
+      utt.voice = voice;
+      synth.speak(utt);
+    } else {
+      // Attendre que les voix se chargent
+      window.speechSynthesis.onvoiceschanged = function() {
+        utt.voice = getBestVoice();
+        synth.speak(utt);
+      };
+      synth.speak(utt);
+    }
+
+    // Workaround bug Chrome — synthèse qui se coupe après 15s
+    var resumeTimer = setInterval(function() {
+      if (!synth.speaking) { clearInterval(resumeTimer); return; }
+      synth.pause();
+      synth.resume();
+    }, 10000);
+
+    utt.onend = function() {
+      clearInterval(resumeTimer);
+      btn.className = 'voice-btn listening';
+      btn.innerHTML = '<div class="voice-dot"></div> Écoute...';
+      document.getElementById('voice-status').textContent = 'Parlez maintenant...';
+      resolve();
+    };
+
+    utt.onerror = function() {
+      clearInterval(resumeTimer);
+      resolve();
+    };
   });
 }
 </script>
