@@ -1958,7 +1958,7 @@ textarea::placeholder { color: var(--muted); }
 
   <footer class="home-footer">
     <span class="hf-text">SalesAI — Simulateur Pro</span>
-    <span class="hf-text">Propulsé par Claude · Anthropic</span>
+    <span class="hf-text">Propulsé par Groq · LLaMA 3.3</span>
   </footer>
 </div>
 
@@ -3337,11 +3337,9 @@ window.addEventListener('load',function(){
 /* ════════════════════════════════
    MODE VOCAL
 ════════════════════════════════ */
-var ELEVEN_KEY = 'sk_cdf1528b7fa4f09f5440fa7e49222e61b80c262447654b33';
-var ELEVEN_VOICE_ID = 'n1u6R6yj3qEpDLH3liBh'; // Voix masculine française
+// Mode vocal — synthèse navigateur native
 var voiceActive = false;
 var recognition = null;
-var currentAudio = null;
 
 function toggleVoice() {
   if (!voiceActive) {
@@ -3367,7 +3365,6 @@ function startVoiceMode() {
 function stopVoiceMode() {
   voiceActive = false;
   if (recognition) { recognition.stop(); recognition = null; }
-  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
   var btn = document.getElementById('voice-btn');
   btn.className = 'voice-btn';
   btn.innerHTML = '<div class="voice-dot"></div> Mode appel';
