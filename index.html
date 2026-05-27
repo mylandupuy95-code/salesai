@@ -3379,6 +3379,17 @@ function startVoiceMode() {
     alert('Le mode vocal nécessite Google Chrome. Ouvrez le simulateur dans Chrome.');
     return;
   }
+
+  // Déverrouiller le moteur audio Chrome au moment du clic
+  var synth = window.speechSynthesis;
+  var unlock = new SpeechSynthesisUtterance('');
+  unlock.volume = 0;
+  synth.speak(unlock);
+  synth.cancel();
+
+  // Précharger les voix
+  synth.getVoices();
+
   voiceActive = true;
   var btn = document.getElementById('voice-btn');
   btn.classList.add('listening');
@@ -3518,8 +3529,6 @@ async function speakText(text) {
     document.getElementById('voice-status').textContent = current.prospect.name + ' parle...';
 
     var synth = window.speechSynthesis;
-
-    // Annuler toute synthèse en cours
     synth.cancel();
 
     var utt = new SpeechSynthesisUtterance(text);
@@ -3528,37 +3537,16 @@ async function speakText(text) {
     utt.pitch = 0.95;
     utt.volume = 1;
 
-    // Chercher la meilleure voix française disponible
-    function getBestVoice() {
-      var voices = synth.getVoices();
-      // Priorité : voix française naturelle
-      var preferred = [
-        'Thomas', 'Amelie', 'Monica', 'Google français',
-        'Microsoft Paul', 'Microsoft Julie'
-      ];
-      for (var i = 0; i < preferred.length; i++) {
-        var v = voices.find(function(v) { return v.name.includes(preferred[i]); });
-        if (v) return v;
-      }
-      // Fallback : n'importe quelle voix fr
-      return voices.find(function(v) { return v.lang.startsWith('fr'); }) || null;
-    }
+    // Sélection voix française
+    var voices = synth.getVoices();
+    var frVoice = voices.find(function(v) {
+      return v.lang === 'fr-FR' || v.lang === 'fr_FR';
+    }) || voices.find(function(v) {
+      return v.lang.startsWith('fr');
+    });
+    if (frVoice) utt.voice = frVoice;
 
-    // Les voix peuvent ne pas être chargées immédiatement
-   function doSpeak() {
-  var voice = getBestVoice();
-  if (voice) utt.voice = voice;
-  synth.cancel();
-  setTimeout(function() { synth.speak(utt); }, 100);
-}
-
-var voices = synth.getVoices();
-if (voices.length > 0) {
-  doSpeak();
-} else {
-  window.speechSynthesis.onvoiceschanged = function() { doSpeak(); };
-}
-    // Workaround bug Chrome — synthèse qui se coupe après 15s
+    // Workaround bug Chrome coupure 15s
     var resumeTimer = setInterval(function() {
       if (!synth.speaking) { clearInterval(resumeTimer); return; }
       synth.pause();
@@ -3573,10 +3561,14 @@ if (voices.length > 0) {
       resolve();
     };
 
-    utt.onerror = function() {
+    utt.onerror = function(e) {
       clearInterval(resumeTimer);
+      console.log('Erreur synthèse:', e.error);
       resolve();
     };
+
+    // Délai court pour laisser Chrome se préparer
+    setTimeout(function() { synth.speak(utt); }, 150);
   });
 }
 </script>
