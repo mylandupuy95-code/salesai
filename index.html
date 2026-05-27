@@ -2734,21 +2734,46 @@ async function send() {
   msgCount++;
   updateCounter();
 
-  // Mise à jour progressive scores & mood
+ // Mise à jour scores basée sur signaux réels
+  const txtLow = txt.toLowerCase();
+  const rand = (amp) => Math.round((Math.random() - 0.5) * amp);
+
+  // --- SIGNAUX NÉGATIFS ---
+  const signauxNegatifs = [
+    'je vais voir', 'je vais en parler', 'je me permets',
+    'solution innovante', 'révolutionnaire', 'on vous accompagne',
+    'comment allez-vous', 'est-ce que vous avez quelques minutes',
+    'valeur ajoutée', 'clé en main', 'synergies'
+  ];
+  const aDesMotsInterdit = signauxNegatifs.some(s => txtLow.includes(s));
+
+  // --- SIGNAUX POSITIFS ---
+  const poseUneQuestion  = (txt.match(/\?/g) || []).length >= 1;
+  const donneUnChiffre   = /\d+/.test(txt);
+  const mentionneClient  = /concurrent|comparaison|différence|versus|par rapport/.test(txtLow);
+  const gereObjection    = /comprends|effectivement|au contraire|en revanche|c'est justement|cela dit/.test(txtLow);
+  const essaieClosing    = /rdv|rendez-vous|proposition|contrat|signer|avancer|prochaine étape|cette semaine/.test(txtLow);
+  const messageCourtVague = txt.length < 30;
+
+  // --- CALCUL DELTA ---
+  function delta(positif, negatif, amp) {
+    if (negatif) return -8 + rand(4);
+    if (positif) return 6 + rand(4);
+    return 1 + rand(3);
+  }
+
+  scores.accroche      = Math.max(5, Math.min(95, scores.accroche      + delta(poseUneQuestion && msgCount <= 3, aDesMotsInterdit || messageCourtVague, 6)));
+  scores.ecoute        = Math.max(5, Math.min(95, scores.ecoute        + delta(poseUneQuestion, messageCourtVague, 5)));
+  scores.argumentation = Math.max(5, Math.min(95, scores.argumentation + delta(donneUnChiffre || mentionneClient, aDesMotsInterdit, 6)));
+  scores.objections    = Math.max(5, Math.min(95, scores.objections    + delta(gereObjection, aDesMotsInterdit, 5)));
+  scores.closing       = Math.max(5, Math.min(95, scores.closing       + delta(essaieClosing, aDesMotsInterdit, 4)));
+
+  // --- HUMEUR basée sur scores ---
+  const scoreMoyen = (scores.accroche + scores.ecoute + scores.argumentation + scores.objections + scores.closing) / 5;
   const p = Math.min(msgCount / MAX_MSG, 1);
-  const rand = () => Math.round((Math.random() - .3) * 8);
-  const nudge = (v, base) => Math.max(5, Math.min(95, Math.round(v + base + rand())));
-
-  const baseDelta = 4 + p * 10;
-  scores.accroche      = nudge(scores.accroche,      baseDelta * .9);
-  scores.ecoute        = nudge(scores.ecoute,        baseDelta * 1.0);
-  scores.argumentation = nudge(scores.argumentation, baseDelta * .95);
-  scores.objections    = nudge(scores.objections,    baseDelta * .85);
-  scores.closing       = nudge(scores.closing,       baseDelta * .7);
-
-  mood.interet   = nudge(mood.interet,   p * 30 + 3);
-  mood.confiance = nudge(mood.confiance, p * 25 + 2);
-  mood.urgence   = nudge(mood.urgence,   p * 20 + 1);
+  mood.interet   = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.9 + rand(8))));
+  mood.confiance = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.75 + rand(8))));
+  mood.urgence   = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.5 + p * 20 + rand(6))));
 
   renderMood();
   renderScores();
