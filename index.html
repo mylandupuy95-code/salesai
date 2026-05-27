@@ -3545,19 +3545,19 @@ async function speakText(text) {
     }
 
     // Les voix peuvent ne pas être chargées immédiatement
-    var voice = getBestVoice();
-    if (voice) {
-      utt.voice = voice;
-      synth.speak(utt);
-    } else {
-      // Attendre que les voix se chargent
-      window.speechSynthesis.onvoiceschanged = function() {
-        utt.voice = getBestVoice();
-        synth.speak(utt);
-      };
-      synth.speak(utt);
-    }
+   function doSpeak() {
+  var voice = getBestVoice();
+  if (voice) utt.voice = voice;
+  synth.cancel();
+  setTimeout(function() { synth.speak(utt); }, 100);
+}
 
+var voices = synth.getVoices();
+if (voices.length > 0) {
+  doSpeak();
+} else {
+  window.speechSynthesis.onvoiceschanged = function() { doSpeak(); };
+}
     // Workaround bug Chrome — synthèse qui se coupe après 15s
     var resumeTimer = setInterval(function() {
       if (!synth.speaking) { clearInterval(resumeTimer); return; }
