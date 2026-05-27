@@ -1996,9 +1996,9 @@ textarea::placeholder { color: var(--muted); }
           <textarea id="txt" placeholder="Répondez naturellement..." rows="2" onkeydown="onKey(event)"></textarea>
           <button class="btn-send" id="btn-send" onclick="send()">Envoyer</button>
           <button class="btn-end" onclick="endSim()">Terminer</button>
-          <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
+        <button class="voice-btn" id="voice-btn" onclick="showVoiceComingSoon()">
   <div class="voice-dot"></div>
-  Mode appel
+  Mode appel 🎙
 </button>
 <div class="voice-status" id="voice-status"></div>
         </div>
@@ -2327,6 +2327,16 @@ function show(id) { showScreen(id); }
 
 function goHome() {
   stopTimer();
+  window.speechSynthesis.cancel();
+  voiceActive = false;
+  if (recognition) { recognition.stop(); recognition = null; }
+  var btn = document.getElementById('voice-btn');
+  if (btn) {
+    btn.className = 'voice-btn';
+    btn.innerHTML = '<div class="voice-dot"></div> Mode appel 🎙';
+  }
+  var status = document.getElementById('voice-status');
+  if (status) status.textContent = '';
   show('landing');
 }
 
@@ -3372,6 +3382,26 @@ function toggleVoice() {
   } else {
     stopVoiceMode();
   }
+}
+
+function showVoiceComingSoon() {
+  // Arrêter toute synthèse en cours
+  window.speechSynthesis.cancel();
+  voiceActive = false;
+
+  var status = document.getElementById('voice-status');
+  var btn = document.getElementById('voice-btn');
+
+  btn.className = 'voice-btn';
+  btn.innerHTML = '<div class="voice-dot"></div> Mode appel 🎙';
+  status.style.color = 'var(--accent)';
+  status.style.fontSize = '10px';
+  status.textContent = '🎙 Mode appel vocal — disponible en version Pro';
+
+  setTimeout(function() {
+    status.textContent = '';
+    status.style.color = '';
+  }, 4000);
 }
 
 function startVoiceMode() {
