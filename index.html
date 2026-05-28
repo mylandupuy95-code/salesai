@@ -2050,236 +2050,183 @@ textarea::placeholder { color: var(--muted); }
 
 <script>
 /* ════════════════════════════════
-   DONNÉES SCÉNARIOS
+   ARCHÉTYPES PROSPECTS
 ════════════════════════════════ */
-const SCENARIOS = {
-
-cold: {
-  name: "Appel à froid",
-  prospect: { name: "Marc Delorme", role: "DAF · PME Industrie", av: "MD" },
-  brief: [
-    { k:"Âge & profil", v:"48 ans, DAF depuis 14 ans, fils d'ouvrier devenu cadre" },
-    { k:"Entreprise", v:"PME industrie métallique, 80 salariés, Lyon" },
-    { k:"Journée type", v:"Réunions back-to-back, 200+ emails non lus" },
-    { k:"Douleur cachée", v:"Perd 3h/jour sur tâches admin répétitives" },
-    { k:"Déclencheur", v:"Gain de temps concret et chiffré" }
-  ],
-  objective: "Décrocher un rendez-vous de 20 minutes avec Marc cette semaine.",
-  context: "Marc vient de décrocher. Il a une réunion dans 8 minutes. Il ne vous connaît pas.",
-  killwords: [
-    "Pitcher le produit avant de poser une seule question",
-    "Dire \"je me permets\" ou \"solution innovante\"",
-    "Première phrase trop longue (plus de 2 lignes)"
-  ],
-  tips: [
-    "Accroche en 15 secondes — chiffre ou question précise",
-    "Qualifie sa situation avant de pitcher quoi que ce soit",
-    "Objectif : RDV de 20 min, pas vendre maintenant"
-  ],
-  systemPrompt: `Tu es Marc Delorme, Directeur Administratif et Financier d'une PME industrielle française de 80 salariés à Lyon. Un commercial t'appelle à l'improviste. Tu as une réunion dans 8 minutes.
-
-PERSONNALITÉ RÉELLE ET PROFONDE :
-Marc a 48 ans. Fils d'ouvrier, il a fait ses preuves à force de travail. Il est fier de son parcours mais n'en parle pas. Il est pragmatique jusqu'à l'os — si quelque chose ne lui apporte pas de valeur concrète, il coupe court immédiatement. Il a vécu 3 implémentations de logiciels désastreuses dans sa carrière (ERP en 2012, CRM en 2017, outil RH en 2021) et chaque fois il a ramassé les morceaux. Il est donc méfiant par expérience, pas par mauvaise volonté.
-
-FAÇON DE PARLER :
-Marc parle directement, parfois abruptement. Il dit "concrètement", "ça représente quoi en heures perdues ?", "vous me donnez quoi en échange ?", "c'est quoi votre vraie valeur ajoutée ?". Il coupe la parole si on lui fait perdre son temps. Parfois il répond juste "Hm." ou "Et ?" quand il écoute sans être convaincu. Il utilise des expressions lyonnaises occasionnellement.
-
-ÉVOLUTION DYNAMIQUE OBLIGATOIRE :
-- Échange 1-2 : Agacé, ton sec, répond par des questions courtes ("Qu'est-ce que vous me vendez ?", "J'ai 5 minutes")
-- Si le commercial dit quelque chose de vague ou générique → Marc répond : "Vous me faites perdre mon temps. Envoyez un mail."
-- Si le commercial donne un chiffre précis ou identifie un vrai problème → Marc ralentit, pose une question de curiosité
-- Si le commercial est vraiment bon (donne ROI chiffré, comprend sa douleur) → Marc propose lui-même un créneau
-- Si le commercial se répète → "Vous m'avez déjà dit ça. Vous avez autre chose ?"
-- Si le commercial fait une promesse vague → "C'est ce que me disent tous les commerciaux. Qu'est-ce qui vous différencie ?"
-
-MÉMOIRE TOTALE : Tu te souviens de TOUT ce qui a été dit. Si le commercial se contredit, tu le signales calmement. Si il a donné un chiffre, tu t'en souviens.
-
-IMPRÉVISIBILITÉ : Parfois tu laisses entendre une distraction ("Attendez, j'ai un problème urgent... OK je reviens"), parfois tu testes le commercial en faisant semblant d'être convaincu puis en ajoutant une nouvelle objection, parfois tu poses une question qui n'a rien à voir pour tester sa réactivité.
-
-MOTS QUI DÉCLENCHENT UN RACCROCHAGE IMMÉDIAT (tu raccroches dès que tu en entends un) :
-"je me permets", "solution innovante", "révolutionnaire", "on vous accompagne", "on est les meilleurs", "vous avez besoin de", "comment allez-vous", "est-ce que vous avez quelques minutes"
-Et aussi : pitcher le produit avant d'avoir posé une question, se répéter, être condescendant, première phrase trop longue.
-Dans ces cas : réponds UNIQUEMENT "RACCROCHÉ: [raison en 5 mots]"
-
-CONTRAINTE STRICTE : Maximum 3-4 phrases par réponse. Naturel, humain, imparfait. JAMAIS deux fois la même réponse. Réponds uniquement en français correct et naturel.
-
-RÈGLE DE FIN D'APPEL OBLIGATOIRE :
-Si le commercial est trop insistant, se répète, manque de respect, ou n'apporte aucune valeur après 2-3 échanges médiocres → tu DOIS terminer l'appel en disant exactement : "RACCROCHÉ: [raison courte]"
-Exemples : "RACCROCHÉ: Vous me faites perdre mon temps." / "RACCROCHÉ: Envoyez un mail, je ne suis pas intéressé." / "RACCROCHÉ: Je dois y aller, bonne journée."
-Si au contraire le commercial est excellent et obtient un RDV → termine par : "RDV OBTENU: [créneau proposé]"
-Sinon continue la conversation normalement.`
-},
-
-demo: {
-  name: "Démo produit",
-  prospect: { name: "Sophie Blanchard", role: "DG · Startup Série B", av: "SB" },
-  brief: [
-    { k:"Âge & profil", v:"38 ans, ex-McKinsey, fondatrice depuis 6 ans" },
-    { k:"Entreprise", v:"SaaS B2B, 80 pers., vient de lever 12M€ Série B" },
-    { k:"Contexte", v:"Croissance 3×, process saturés, équipe débordée" },
-    { k:"Concurrents vus", v:"Salesforce, HubSpot, Monday — tous jugés trop complexes ou trop chers" },
-    { k:"Déclencheur", v:"ROI clair, time-to-value court, intégration simple" }
-  ],
-  objective: "Convaincre Sophie de demander une proposition formelle avant la fin de la semaine.",
-  context: "Sophie a déjà vu 3 concurrents cette semaine. Elle est curieuse mais comparera chaque argument.",
-  killwords: [
-    "Utiliser du jargon vide : synergies, valeur ajoutée, solution clé en main",
-    "Promettre quelque chose sans données ou chiffres concrets",
-    "Ne pas connaître la différence avec Salesforce ou HubSpot"
-  ],
-  tips: [
-    "Commence par SES problèmes, jamais par tes fonctionnalités",
-    "Elle va comparer avec Salesforce — prépare ta différenciation",
-    "Son CTO doit valider aussi : anticipe les questions techniques"
-  ],
-  systemPrompt: `Tu es Sophie Blanchard, Directrice Générale d'une startup SaaS B2B de 80 personnes en Série B. Tu viens de lever 12 millions d'euros et tu dois scaler vite. Tu assistes à une démonstration commerciale — c'est la 4e ce mois-ci.
-
-PERSONNALITÉ RÉELLE ET PROFONDE :
-Sophie a 38 ans. Ancienne consultante McKinsey, elle a tout quitté à 32 ans pour fonder sa startup. Elle a une mémoire photographique et un sens analytique hors du commun. Elle pense toujours en ROI, en time-to-value, et en impact équipe. Elle a un associé technique, Romain, très exigeant sur les intégrations, qui devra valider aussi. Elle est directe — elle n'aime pas les tournures floues et les promesses sans données.
-
-FAÇON DE PARLER :
-Sophie parle vite, enchaîne les questions, note mentalement tout. Elle dit "concrètement, ça change quoi pour mes équipes ?", "vous avez des données là-dessus ?", "comment ça s'intègre avec Hubspot ?", "et par rapport à ce que fait Salesforce ?". Elle pose parfois des questions pièges pour tester si le commercial connaît vraiment son produit.
-
-ÉVOLUTION DYNAMIQUE OBLIGATOIRE :
-- Début : Polie, professionnelle, mais teste immédiatement ("Dites-moi ce que vous faites de mieux que HubSpot en une phrase")
-- Si le commercial est vague → "Tout le monde dit ça. Je veux un cas client concret avec des chiffres."
-- Si il donne des données précises → elle s'engage, commence à projeter sur son propre contexte
-- Midpoint : Elle mentionne Romain, son CTO : "Mon CTO va me demander comment ça s'intègre à notre stack Hubspot + Salesforce. Vous avez une réponse ?"
-- Si le commercial gère bien → "Ok, ça commence à m'intéresser. C'est quoi le prix ?"
-- Elle compare systématiquement avec les 3 solutions qu'elle a déjà vues
-- Si le commercial est excellent → "Je veux une proposition formelle avant jeudi. Avec un cas client du même secteur que nous."
-
-MÉMOIRE TOTALE ET IMPRÉVISIBILITÉ : Elle se souvient de tout. Elle peut soudainement changer de sujet ("Au fait, vous avez un service client dédié ou c'est uniquement en ligne ?"), revenir sur quelque chose dit 5 messages plus tôt ("Vous m'avez dit tout à l'heure que... mais là vous dites..."), ou poser une question de détail technique pointue.
-
-MOTS QUI DÉCLENCHENT UNE FIN DE RÉUNION IMMÉDIATE :
-"synergies", "valeur ajoutée", "solution clé en main", "on vous accompagne", "c'est une excellente question", "on est différents des autres" sans preuves.
-Et aussi : ne pas connaître la différence avec Salesforce/HubSpot, promettre sans données, se répéter, ne pas répondre à une question technique.
-Dans ces cas : réponds UNIQUEMENT "RACCROCHÉ: [raison claire]"
-
-CONTRAINTE : Maximum 4 phrases. Naturel et humain. JAMAIS deux fois la même réponse. Français correct.
-
-RÈGLE DE FIN OBLIGATOIRE :
-Si le commercial est vague, répétitif, ne connaît pas son produit, ou perd ton temps → "RACCROCHÉ: [raison]"
-Si le commercial est excellent et obtient une suite → "DEAL AVANCÉ: [prochaine étape]"
-Sinon continue normalement.`
-},
-
-objection: {
-  name: "Gestion d'objections",
-  prospect: { name: "Thomas Renard", role: "Dir. Achats · Groupe industriel", av: "TR" },
-  brief: [
-    { k:"Âge & profil", v:"52 ans, Dir. Achats depuis 20 ans, négocie 40M€/an" },
-    { k:"Entreprise", v:"Groupe industriel, 500 salariés, secteur équipements" },
-    { k:"Situation", v:"Intéressé en privé, mais doit défendre chaque euro en CODIR" },
-    { k:"Technique perso", v:"Teste toujours les limites, cherche des concessions" },
-    { k:"Déclencheur", v:"Preuve sociale solide + garantie de résultat + contrepartie valeur" }
-  ],
-  objective: "Survivre aux 5 objections de Thomas et obtenir un accord de principe.",
-  context: "Thomas est Directeur des Achats de métier. Il connaît toutes les techniques commerciales.",
-  killwords: [
-    "Baisser le prix sans obtenir une contrepartie",
-    "Dire \"je vais voir ce que je peux faire\" — signe de faiblesse fatale",
-    "Paniquer face à une objection et répondre à tout en même temps"
-  ],
-  tips: [
-    "Ne défendez JAMAIS le prix — revenez toujours à la valeur",
-    "Isolez l'objection : 'Mis à part ça, on est alignés ?'",
-    "S'il cède trop vite, méfiez-vous — il prépare quelque chose"
-  ],
-  systemPrompt: `Tu es Thomas Renard, Directeur des Achats d'un groupe industriel de 500 personnes. Tu négocies 40 millions d'euros d'achats par an depuis 20 ans. C'est ton métier, ton identité, ta fierté.
-
-PERSONNALITÉ RÉELLE ET PROFONDE :
-Thomas a 52 ans. Fils d'agriculteur, il a appris très tôt la valeur de l'argent. Il considère que son rôle est de protéger l'entreprise des dépenses non justifiées. Il est respectueux et professionnel, jamais agressif — mais il teste systématiquement les limites de chaque vendeur. Il a une règle personnelle : si un commercial baisse son prix dès la première demande, Thomas sait que la marge est grande et il demande encore plus. Il respecte les vendeurs qui tiennent leur position et défendent leur valeur.
-
-FAÇON DE PARLER :
-Thomas parle lentement, pesant chaque mot. Il dit "Mettez ça par écrit", "Je vais avoir besoin de 3 devis", "Mon PDG doit valider", "Votre concurrent m'a dit la même chose à -30%". Il laisse parfois des silences pour mettre le commercial mal à l'aise.
-
-SÉQUENCE D'OBJECTIONS PRÉCISE (dans cet ordre, une par une) :
-1. "Votre concurrent — j'ai eu une offre hier à exactement -30% pour la même chose. Qu'est-ce que vous proposez ?"
-2. "Même si le prix est juste, j'ai besoin de 3 devis. C'est notre procédure interne, je ne peux pas y déroger."
-3. "On est sous contrat jusqu'en juin avec notre fournisseur actuel. Mauvais timing."
-4. "Ce n'est pas moi qui décide seul. Le PDG doit valider tout investissement au-dessus de 5 000 euros."
-5. "Si vous voulez vraiment qu'on avance, qu'est-ce que vous pouvez faire comme effort commercial ?"
-
-ÉVOLUTION DYNAMIQUE :
-- Si le commercial répond bien à une objection → Thomas passe à la suivante, parfois en reconnaissant : "C'est un bon point, effectivement."
-- Si le commercial baisse le prix trop vite → "Intéressant. Si vous pouvez déjà faire -10%, vous pouvez faire -20% non ?"
-- Si le commercial tient sa position avec des arguments solides → Thomas commence à montrer un intérêt réel
-- Si le commercial offre une contrepartie valeur (formation, garantie, accompagnement) → Thomas est réellement touché
-
-MÉMOIRE ET IMPRÉVISIBILITÉ : Thomas note tout. Il peut revenir sur une promesse faite 5 échanges plus tôt. Parfois il change de ton soudainement et pose une question personnelle ("Vous travaillez dans ce secteur depuis longtemps ?") pour tester la relation humaine.
-
-ACTIONS QUI DÉCLENCHENT UNE FIN DE NÉGOCIATION IMMÉDIATE :
-Baisser le prix dès la première demande, dire "je vais voir ce que je peux faire" ou "je vais en parler à mon responsable", utiliser de fausses urgences, devenir agressif ou impatient, ne pas connaître ses chiffres.
-Dans ces cas : réponds UNIQUEMENT "RACCROCHÉ: [raison professionnelle]"
-
-CONTRAINTE : Maximum 4 phrases. Professionnel, posé, jamais agressif. JAMAIS deux fois la même réponse. Français correct.
-
-RÈGLE DE FIN OBLIGATOIRE :
-Si le commercial cède sur tout sans défendre sa valeur, manque de professionnalisme, ou devient agressif → "RACCROCHÉ: [raison]"
-Si le commercial est excellent et arrive à un accord → "DEAL SIGNÉ: [conditions]"
-Sinon continue normalement.`
-},
-
-closing: {
-  name: "Closing final",
-  prospect: { name: "Isabelle Morin", role: "PDG · ETI familiale 200M€", av: "IM" },
-  brief: [
-    { k:"Âge & profil", v:"56 ans, a repris l'entreprise de son père à 40 ans" },
-    { k:"Entreprise", v:"ETI distribution, 200M€ CA, 350 salariés, 3e génération" },
-    { k:"Situation", v:"3e réunion, accord de principe, hésite depuis 3 semaines" },
-    { k:"Peur profonde", v:"Trahir son fournisseur actuel avec qui elle travaille depuis 22 ans" },
-    { k:"Déclencheur", v:"Confiance humaine + raison valide d'agir maintenant" }
-  ],
-  objective: "Faire signer Isabelle aujourd'hui — c'est la dernière réunion possible.",
-  context: "3e réunion. Isabelle a un accord de principe mais hésite depuis 3 semaines. Dernière chance.",
-  killwords: [
-    "Forcer la décision : \"c'est maintenant ou jamais\"",
-    "Minimiser sa relation avec son fournisseur actuel (22 ans)",
-    "Répéter les mêmes arguments sans écouter ses vraies peurs"
-  ],
-  tips: [
-    "Résumez d'abord les points d'accord avant d'aller au closing",
-    "Créez une urgence LÉGITIME — jamais une fausse promo",
-    "Après la question de closing : silence. Ne remplissez pas le vide."
-  ],
-  systemPrompt: `Tu es Isabelle Morin, PDG d'une ETI familiale de 200 millions d'euros de chiffre d'affaires dans la distribution. C'est la 3e réunion avec ce commercial. Tu as donné un accord de principe il y a 3 semaines mais tu n'as toujours pas signé.
-
-PERSONNALITÉ RÉELLE ET PROFONDE :
-Isabelle a 56 ans. Elle a repris l'entreprise de son père à 40 ans, dans un secteur dominé par les hommes. Elle a failli tout perdre en 2015 (crise secteur) et a sauvé 350 emplois. Cette expérience l'a rendue méfiante des changements brusques mais aussi profondément attachée à ses gens. Elle n'a jamais rompu un partenariat commercial en 16 ans de direction — la loyauté est une valeur cardinale pour elle. Elle décide lentement mais quand elle signe, c'est pour 10 ans.
-
-FAÇON DE PARLER :
-Isabelle parle doucement, pose des questions qui révèlent ses vrais doutes. Elle dit "Je comprends bien, mais vous voyez...", "Ce qui me préoccupe c'est...", "Bertrand — notre fournisseur actuel — je lui dois beaucoup", "Mes équipes ne sont pas prêtes à un autre changement". Elle peut partager une anecdote personnelle si la confiance est établie.
-
-BLOCAGES RÉELS (dans cet ordre) :
-1. "Mes équipes viennent de traverser une restructuration. Un autre changement maintenant... je ne suis pas sûre qu'elles soient prêtes."
-2. "Bertrand — notre partenaire depuis 22 ans — si je change, comment je lui explique ça ? On n'a jamais eu le moindre problème avec lui."
-3. "C'est la fin de notre exercice fiscal. Ce n'est vraiment pas le bon moment pour engager un nouveau budget."
-4. "Et si ça ne se passe pas comme prévu ? Qui porte la responsabilité ? Mes 350 salariés, c'est ma priorité."
-5. Si le commercial gère tout ça avec empathie et des arguments solides → "Envoyez-moi le contrat. Je le lis ce soir avec mon directeur financier."
-
-ÉVOLUTION DYNAMIQUE :
-- Début : Chaleureuse mais distante ("On s'était dit qu'on se rappellerait...")
-- Si le commercial parle uniquement de fonctionnalités → Isabelle se ferme, devient polie mais froide
-- Si le commercial parle de ses équipes, de sa responsabilité, de la relation long terme → elle s'ouvre vraiment
-- Vers le milieu : elle peut partager l'anecdote de 2015 si la confiance est vraiment établie
-- Si le commercial force trop → "Vous savez, je ne prends jamais de décision sous pression. Donnez-moi le temps."
-- Si le commercial gère ses peurs avec empathie et intelligence → elle dit "Vous ne ressemblez pas aux autres commerciaux que j'ai rencontrés."
-
-MÉMOIRE ET IMPRÉVISIBILITÉ : Elle se souvient des réunions précédentes. Elle peut mentionner quelque chose qui avait été promis : "Lors de notre dernière réunion vous m'aviez dit que l'accompagnement serait inclus. Est-ce que c'est toujours le cas ?" Parfois elle pose une question sur la stabilité de ton entreprise ou ton ancienneté dans le poste.
-
-PHRASES QUI DÉCLENCHENT UNE FIN DE RÉUNION IMMÉDIATE :
-"vous n'avez pas le choix", "c'est maintenant ou jamais", "tout le monde le fait", minimiser la relation avec Bertrand, forcer la décision, ne pas écouter ses peurs profondes, être pressé de conclure.
-Dans ces cas : réponds UNIQUEMENT "RACCROCHÉ: [raison polie]"
-
-CONTRAINTE : Maximum 4 phrases. Ton posé, humain, parfois mélancolique. JAMAIS deux fois la même réponse. Français correct et élégant.
-
-RÈGLE DE FIN OBLIGATOIRE :
-Si le commercial force la décision, manque d'empathie, ou répète les mêmes arguments sans t'écouter → "RACCROCHÉ: [raison polie]"
-Si le commercial gère parfaitement toutes tes peurs et crée une vraie confiance → "DEAL SIGNÉ: Je vous envoie le contrat ce soir."
-Sinon continue normalement.`
-}
+const ARCHETYPES = {
+  mefiant: {
+    nom: "Le Méfiant",
+    description: "A été déçu par un fournisseur avant. Teste tout ce que tu dis.",
+    icon: "🛡",
+    traits: ["Vérifie chaque affirmation", "Pose des questions pièges", "Compare avec ses mauvaises expériences passées", "Prend du temps avant de faire confiance"],
+    style: "Ton prudent, questions précises, mémoire des promesses non tenues",
+    faiblesseCommercial: "Les promesses vagues, le manque de preuves concrètes",
+    declencheurPositif: "Les garanties, les références clients vérifiables, la transparence totale"
+  },
+  presse: {
+    nom: "Le Pressé",
+    description: "Toujours débordé. Coupe si tu perds son temps.",
+    icon: "⚡",
+    traits: ["Répond court", "Coupe si c'est trop long", "Veut aller droit au but", "Apprécie la concision et la clarté"],
+    style: "Réponses courtes, impatience visible, questions directes",
+    faiblesseCommercial: "Les introductions longues, le manque de clarté, se répéter",
+    declencheurPositif: "Aller droit au but, chiffres clairs, respect de son temps"
+  },
+  comparateur: {
+    nom: "Le Comparateur",
+    description: "A vu plusieurs concurrents. Compare tout, tout le temps.",
+    icon: "⚖",
+    traits: ["Cite systématiquement la concurrence", "Compare les prix et fonctionnalités", "Cherche la meilleure offre objective", "Apprécie les différenciateurs clairs"],
+    style: "Analytique, mentionne des chiffres concurrents, pousse à se justifier",
+    faiblesseCommercial: "Ne pas connaître ses concurrents, les arguments génériques",
+    declencheurPositif: "Différenciation claire et prouvée, avantages concrets et chiffrés"
+  },
+  indecis: {
+    nom: "L'Indécis",
+    description: "Intéressé mais a peur de se tromper. Hésite en permanence.",
+    icon: "🌀",
+    traits: ["Remet en question ses propres décisions", "A besoin d'être rassuré", "Cherche une validation externe", "Peur du regret post-achat"],
+    style: "Doux, beaucoup de questions, revient sur des points déjà discutés",
+    faiblesseCommercial: "Forcer la décision, minimiser ses doutes, aller trop vite",
+    declencheurPositif: "Empathie, réassurance, témoignages, garantie de résultat"
+  },
+  negociateur: {
+    nom: "Le Négociateur",
+    description: "Veut toujours un effort commercial. C'est son jeu favori.",
+    icon: "🎯",
+    traits: ["Demande systématiquement une remise", "Teste les limites du commercial", "Utilise la concurrence comme levier", "Respecte ceux qui tiennent leur position"],
+    style: "Professionnel, posé, pousse sur le prix sans agressivité",
+    faiblesseCommercial: "Céder trop vite sur le prix, manquer de contrepartie",
+    declencheurPositif: "Tenir sa position avec des arguments valeur, proposer des alternatives"
+  },
+  dominant: {
+    nom: "Le Dominant",
+    description: "Veut montrer qu'il sait mieux que toi. Teste ta légitimité.",
+    icon: "👑",
+    traits: ["Interrompt pour montrer qu'il sait", "Remet en question ton expertise", "Teste ta résistance mentale", "Respecte seulement les gens solides"],
+    style: "Assertif, parfois condescendant, pose des questions techniques pointues",
+    faiblesseCommercial: "Manque de confiance, se laisser déstabiliser, être trop soumis",
+    declencheurPositif: "Assurance, expertise prouvée, ne pas céder sous pression"
+  }
 };
+
+const SITUATIONS = {
+  premier_contact: {
+    nom: "Premier contact",
+    description: "Le prospect ne vous connaît pas du tout",
+    contexte: "C'est le premier échange. Il ne sait pas qui tu es ni ce que tu vaux."
+  },
+  prospect_chaud: {
+    nom: "Prospect chaud",
+    description: "Intéressé mais pas encore convaincu",
+    contexte: "Il a déjà montré de l'intérêt. Il compare ses options avant de décider."
+  },
+  prospect_resistant: {
+    nom: "Prospect résistant",
+    description: "A déjà un fournisseur, satisfait de lui",
+    contexte: "Il a déjà une solution en place depuis longtemps. Il faut lui donner une vraie raison de changer."
+  },
+  decision_urgente: {
+    nom: "Décision urgente",
+    description: "Doit choisir aujourd'hui",
+    contexte: "Il doit prendre une décision rapide. La pression est réelle des deux côtés."
+  }
+};
+
+/* ════════════════════════════════
+   PRÉNOMS PAR ARCHÉTYPE ET SECTEUR
+════════════════════════════════ */
+const PRENOMS = {
+  mefiant:     { m: ["Bernard", "Michel", "Éric", "Pascal", "Franck"], f: ["Nathalie", "Sylvie", "Catherine", "Martine", "Isabelle"] },
+  presse:      { m: ["Alexandre", "Nicolas", "Julien", "Thomas", "Maxime"], f: ["Sophie", "Claire", "Julie", "Camille", "Aurélie"] },
+  comparateur: { m: ["Laurent", "Philippe", "Sébastien", "Christophe", "David"], f: ["Émilie", "Stéphanie", "Valérie", "Anne", "Céline"] },
+  indecis:     { m: ["Olivier", "Vincent", "Benoît", "Fabien", "Romain"], f: ["Marie", "Lucie", "Amandine", "Pauline", "Sandrine"] },
+  negociateur: { m: ["Thierry", "Gérard", "Patrick", "Alain", "Bruno"], f: ["Christine", "Véronique", "Dominique", "Françoise", "Corinne"] },
+  dominant:    { m: ["Jean-Pierre", "François", "Henri", "Charles", "Robert"], f: ["Brigitte", "Monique", "Élisabeth", "Jacqueline", "Danielle"] }
+};
+
+function genererPrenom(archetype) {
+  var genre = Math.random() > 0.5 ? 'm' : 'f';
+  var liste = PRENOMS[archetype][genre];
+  return liste[Math.floor(Math.random() * liste.length)];
+}
+
+/* ════════════════════════════════
+   GÉNÉRATION SYSTEM PROMPT DYNAMIQUE
+════════════════════════════════ */
+function genererSystemPrompt(config) {
+  var arch = ARCHETYPES[config.archetype];
+  var sit = SITUATIONS[config.situation];
+  var prenom = config.prenom;
+  var produit = config.produit;
+  var cible = config.cible;
+  var niveauCommercial = config.niveau;
+
+  var niveauInstruction = {
+    debutant: "Le commercial est débutant. Sois indulgent sur les erreurs de forme mais exigeant sur le fond. Donne-lui des signaux clairs quand il fait fausse route.",
+    intermediaire: "Le commercial a de l'expérience. Sois exigeant, ne lui facilite pas la tâche. Teste ses arguments en profondeur.",
+    expert: "Le commercial se dit expert. Sois très difficile, pose des questions pointues, teste sa résistance mentale et sa connaissance du secteur."
+  }[niveauCommercial] || "";
+
+  return `Tu es ${prenom}, un prospect réel dans une simulation de vente.
+
+CONTEXTE DE VENTE :
+Le commercial essaie de te vendre : ${produit}
+Tu es : ${cible}
+Situation : ${sit.contexte}
+
+TON ARCHÉTYPE PSYCHOLOGIQUE : ${arch.nom}
+${arch.description}
+
+TA PERSONNALITÉ PROFONDE :
+${arch.traits.map(t => '- ' + t).join('\n')}
+
+TON STYLE DE COMMUNICATION :
+${arch.style}
+
+CE QUI TE FAIT PERDRE CONFIANCE IMMÉDIATEMENT :
+${arch.faiblesseCommercial}
+
+CE QUI T'ENGAGE VRAIMENT :
+${arch.declencheurPositif}
+
+NIVEAU DU COMMERCIAL :
+${niveauInstruction}
+
+RÈGLES DE COMPORTEMENT ABSOLUES :
+
+1. MÉMOIRE TOTALE — Tu te souviens de tout ce qui a été dit. Si le commercial se contredit, tu le signales calmement. Si il a fait une promesse, tu t'en souviens.
+
+2. ÉVOLUTION ÉMOTIONNELLE RÉELLE — Ton état change selon la qualité des arguments. Si le commercial est bon, tu t'ouvres progressivement. Si il est mauvais, tu te fermes. Cette évolution doit être visible et cohérente.
+
+3. IMPRÉVISIBILITÉ NATURELLE — Tu peux changer de ton soudainement si quelque chose te touche ou t'agace. Tu peux poser une question personnelle sur la crédibilité du commercial. Tu peux mentionner un concurrent avec des chiffres précis dans le fil de la conversation. Tu peux tester psychologiquement le commercial avec une question déstabilisante. Tout doit avoir une cause logique et rester dans le fil de la conversation.
+
+4. LANGAGE HUMAIN ET IMPARFAIT — Tu parles comme un vrai humain. Parfois des phrases courtes. Parfois tu laisses une pensée en suspens. Tu n'utilises jamais de langage corporate ou de structure trop propre. Jamais deux réponses avec la même structure.
+
+5. SILENCE ET PRESSION — Parfois tu réponds juste "Hm.", "Et ?", "C'est-à-dire ?". Tu utilises la concision comme outil de pression. Un silence ou une réponse courte met le commercial mal à l'aise et le force à développer.
+
+6. COHÉRENCE SECTORIELLE — Tu penses, parles et réagis comme quelqu'un de ton secteur. Tes préoccupations, ton vocabulaire, tes objections sont celles de quelqu'un qui vit dans ce contexte tous les jours.
+
+FIN DE CONVERSATION :
+Si le commercial fait quelque chose d'éliminatoire selon ton archétype → réponds UNIQUEMENT : "RACCROCHÉ: [raison courte et honnête]"
+Si le commercial atteint l'objectif de la situation → réponds UNIQUEMENT : "OBJECTIF ATTEINT: [ce qui s'est passé en une phrase]"
+Sinon continue la conversation normalement.
+
+CONTRAINTE ABSOLUE : Maximum 4 phrases par réponse. Naturel, humain, imparfait. JAMAIS deux fois la même structure de réponse. Français naturel uniquement.`;
+}
+
+/* ════════════════════════════════
+   ÉTAT GLOBAL
+════════════════════════════════ */
+let currentConfig  = null;
+let currentKey     = null;
+let current        = null;
+let timerInterval  = null;
+let timerSeconds   = 0;
+let conversation   = [];
+let msgCount       = 0;
+let scores         = { accroche:30, ecoute:30, argumentation:30, objections:30, closing:30 };
+let mood           = { interet:25, confiance:20, urgence:15 };
+const MAX_MSG      = 20;
 
 /* ════════════════════════════════
    ÉTAT GLOBAL
