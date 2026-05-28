@@ -1896,70 +1896,120 @@ textarea::placeholder { color: var(--muted); }
     </div>
   </div>
 </div>
-  <div id="home">
-  <nav class="home-nav">
-    <div class="logo-mark">
-      <div class="logo-icon">S</div>
-      <span class="logo-text">SalesAI</span>
+ <div id="home" style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg)">
+  <nav style="padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--s1)">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#000">S</div>
+      <span style="font-size:13px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:var(--ink)">SalesAI</span>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
-      <button onclick="showHistory()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:JetBrains Mono,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--muted)'">Historique</button>
-      <div class="home-badge">Simulateur Pro v5</div>
+      <button onclick="showHistory()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">Historique</button>
+      <button onclick="showScreen('landing')" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Accueil</button>
     </div>
   </nav>
 
-  <div class="home-body">
-    <div class="home-left">
-      <div class="home-eyebrow">Entraînement commercial IA</div>
-      <h1 class="home-title">
-        Apprends<br>à<br><em>vendre.</em>
-      </h1>
-      <p class="home-desc">Des prospects IA avec de vraies personnalités — humeurs, mémoire, imprévisibilité. Chaque conversation est unique. Débriefing expert après chaque session.</p>
-      <div class="home-stats">
-        <div class="hs"><span class="hs-n">4</span><span class="hs-l">Scénarios</span></div>
-        <div class="hs"><span class="hs-n">∞</span><span class="hs-l">Conversations</span></div>
-        <div class="hs"><span class="hs-n">5</span><span class="hs-l">Critères</span></div>
+  <!-- ÉTAPE 1 : CONTEXTE -->
+  <div id="step-1" style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="max-width:620px;width:100%">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="width:24px;height:1px;background:var(--accent);display:inline-block"></span>Étape 1 / 3 — Votre contexte</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:40px">Ce que vous<br><em style="font-style:italic;color:var(--accent)">vendez.</em></div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Ce que vous vendez</div>
+        <input id="input-produit" type="text" placeholder="ex: voitures premium, logiciel RH, cuisine sur mesure, assurance vie..." style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:4px">
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">Soyez précis — plus c'est précis, plus le prospect sera réaliste</div>
       </div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">À qui vous vendez</div>
+        <input id="input-cible" type="text" placeholder="ex: particulier qui hésite, directeur achat méfiant, gérant de PME pressé..." style="width:100%;background:var(--s2);border:1px solid var(--border2);border-bottom:2px solid var(--accent);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;margin-bottom:4px">
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">Décrivez votre client type dans cette situation</div>
+      </div>
+
+      <div style="margin-bottom:32px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Votre niveau</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div onclick="selectNiveau('debutant')" id="niv-debutant" style="border:1px solid var(--border2);padding:16px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="resetNiveauHover(this,'debutant')">
+            <div style="font-size:20px;margin-bottom:8px">🌱</div>
+            <div style="font-size:11px;color:var(--ink);font-weight:500;margin-bottom:4px">Débutant</div>
+            <div style="font-size:9px;color:var(--muted)">Je commence la vente</div>
+          </div>
+          <div onclick="selectNiveau('intermediaire')" id="niv-intermediaire" style="border:1px solid var(--border2);padding:16px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="resetNiveauHover(this,'intermediaire')">
+            <div style="font-size:20px;margin-bottom:8px">⚡</div>
+            <div style="font-size:11px;color:var(--ink);font-weight:500;margin-bottom:4px">Intermédiaire</div>
+            <div style="font-size:9px;color:var(--muted)">J'ai de l'expérience</div>
+          </div>
+          <div onclick="selectNiveau('expert')" id="niv-expert" style="border:1px solid var(--border2);padding:16px;cursor:pointer;text-align:center;transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="resetNiveauHover(this,'expert')">
+            <div style="font-size:20px;margin-bottom:8px">🎯</div>
+            <div style="font-size:11px;color:var(--ink);font-weight:500;margin-bottom:4px">Expert</div>
+            <div style="font-size:9px;color:var(--muted)">Je veux le maximum</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="goStep2()" style="width:100%;background:var(--accent);color:#000;border:none;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer">Continuer →</button>
     </div>
+  </div>
 
-    <div class="home-right">
-      <div class="scenarios-label">// Choisir un scénario</div>
+  <!-- ÉTAPE 2 : SITUATION -->
+  <div id="step-2" style="display:none;flex:1;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="max-width:620px;width:100%">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="width:24px;height:1px;background:var(--accent);display:inline-block"></span>Étape 2 / 3 — La situation</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:40px">Quel type<br><em style="font-style:italic;color:var(--accent)">d'appel ?</em></div>
 
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px" id="situations-list"></div>
 
-      <div class="sc" onclick="launch('cold')">
-        <div class="sc-top"><div class="sc-name">Appel à froid</div><div class="sc-diff d1">Niveau 1 — Débutant</div></div>
-        <div class="sc-desc">Marc vient de décrocher. Il a une réunion dans 8 minutes. Décrocher un RDV avant qu'il raccroche. Il coupe si tu pitches trop tôt, si tu es vague ou si tu manques de clarté.</div>
-        <div class="sc-trains">Travaille : accroche rapide · qualification · gestion du temps · première impression</div>
-        <div class="sc-footer"><div><div class="sc-prospect-name">Marc Delorme</div><div class="sc-prospect-role">DAF · PME Industrie · 80 salariés</div></div><div class="sc-arrow">→</div></div>
-      </div>
-
-      <div class="sc" onclick="launch('demo')">
-        <div class="sc-top"><div class="sc-name">Démo & Pitch produit</div><div class="sc-diff d2">Niveau 2 — Intermédiaire</div></div>
-        <div class="sc-desc">Sophie a vu 3 concurrents cette semaine. Elle coupe si tu utilises du jargon vide, si tu ne connais pas ton produit ou si tu promets sans données concrètes.</div>
-        <div class="sc-trains">Travaille : pitch structuré · écoute active · différenciation · réponse aux questions techniques</div>
-        <div class="sc-footer"><div><div class="sc-prospect-name">Sophie Blanchard</div><div class="sc-prospect-role">DG · Startup Série B · 80 personnes</div></div><div class="sc-arrow">→</div></div>
-      </div>
-
-      <div class="sc" onclick="launch('objection')">
-        <div class="sc-top"><div class="sc-name">Gestion d'objections</div><div class="sc-diff d3">Niveau 3 — Difficile</div></div>
-        <div class="sc-desc">Thomas négocie 40M€/an de métier. Il raccroche si tu baisses le prix sans contrepartie, si tu paniques ou si tu dis "je vais voir ce que je peux faire".</div>
-        <div class="sc-trains">Travaille : traitement des objections · défense du prix · isoler les blocages · négociation valeur</div>
-        <div class="sc-footer"><div><div class="sc-prospect-name">Thomas Renard</div><div class="sc-prospect-role">Dir. Achats · Groupe industriel · 500 pers.</div></div><div class="sc-arrow">→</div></div>
-      </div>
-
-      <div class="sc" onclick="launch('closing')">
-        <div class="sc-top"><div class="sc-name">Closing final</div><div class="sc-diff d4">Niveau 4 — Expert</div></div>
-        <div class="sc-desc">Isabelle hésite depuis 3 semaines. Elle met fin si tu forces la décision, si tu minimises sa relation avec son fournisseur actuel ou si tu manques d'empathie.</div>
-        <div class="sc-trains">Travaille : empathie · urgence légitime · closing silencieux · confiance humaine</div>
-        <div class="sc-footer"><div><div class="sc-prospect-name">Isabelle Morin</div><div class="sc-prospect-role">PDG · ETI familiale · 200 M€ CA</div></div><div class="sc-arrow">→</div></div>
+      <div style="display:flex;gap:10px">
+        <button onclick="goStep1()" style="background:transparent;color:var(--muted);border:1px solid var(--border2);padding:16px 24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+        <button onclick="goStep3()" style="flex:1;background:var(--accent);color:#000;border:none;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer">Continuer →</button>
       </div>
     </div>
   </div>
 
-  <footer class="home-footer">
-    <span class="hf-text">SalesAI — Simulateur Pro</span>
-    <span class="hf-text">Propulsé par Groq · LLaMA 3.3</span>
-  </footer>
+  <!-- ÉTAPE 3 : MODE ET ARCHÉTYPE -->
+  <div id="step-3" style="display:none;flex:1;align-items:center;justify-content:center;padding:60px 48px">
+    <div style="max-width:620px;width:100%">
+      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px"><span style="width:24px;height:1px;background:var(--accent);display:inline-block"></span>Étape 3 / 3 — Votre prospect</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:40px">Face à<br><em style="font-style:italic;color:var(--accent)">qui ?</em></div>
+
+      <!-- MODE SÉLECTION -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px">
+        <div onclick="selectMode('cible')" id="mode-cible" style="border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:center;transition:all .2s">
+          <div style="font-size:18px;margin-bottom:6px">🎯</div>
+          <div style="font-size:10px;color:var(--ink);font-weight:500;margin-bottom:3px">Ciblé</div>
+          <div style="font-size:9px;color:var(--muted)">Je choisis le profil</div>
+        </div>
+        <div onclick="selectMode('aleatoire')" id="mode-aleatoire" style="border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:center;transition:all .2s">
+          <div style="font-size:18px;margin-bottom:6px">🎲</div>
+          <div style="font-size:10px;color:var(--ink);font-weight:500;margin-bottom:3px">Aléatoire</div>
+          <div style="font-size:9px;color:var(--muted)">Surprise totale</div>
+        </div>
+        <div onclick="selectMode('progression')" id="mode-progression" style="border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:center;transition:all .2s">
+          <div style="font-size:18px;margin-bottom:6px">📈</div>
+          <div style="font-size:10px;color:var(--ink);font-weight:500;margin-bottom:3px">Progression</div>
+          <div style="font-size:9px;color:var(--muted)">Selon mes faiblesses</div>
+        </div>
+      </div>
+
+      <!-- ARCHÉTYPES — visible seulement en mode ciblé -->
+      <div id="archetypes-grid" style="display:none;flex-direction:column;gap:8px;margin-bottom:24px"></div>
+
+      <!-- INFO MODE ALÉATOIRE -->
+      <div id="info-aleatoire" style="display:none;background:var(--s2);border:1px solid var(--border2);border-left:3px solid var(--accent);padding:20px;margin-bottom:24px">
+        <div style="font-size:11px;color:var(--ink2);line-height:1.7">Le prospect sera généré aléatoirement. Vous ne saurez pas à qui vous avez affaire avant de commencer — exactement comme dans la vraie vie.</div>
+      </div>
+
+      <!-- INFO MODE PROGRESSION -->
+      <div id="info-progression" style="display:none;background:var(--s2);border:1px solid var(--border2);border-left:3px solid var(--accent);padding:20px;margin-bottom:24px">
+        <div id="progression-text" style="font-size:11px;color:var(--ink2);line-height:1.7">Analyse de vos sessions précédentes en cours...</div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button onclick="goStep2()" style="background:transparent;color:var(--muted);border:1px solid var(--border2);padding:16px 24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">← Retour</button>
+        <button onclick="lancerSimulation()" style="flex:1;background:var(--accent);color:#000;border:none;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;cursor:pointer">Lancer la simulation →</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ════════ SIMULATION ════════ -->
