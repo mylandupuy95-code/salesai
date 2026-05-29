@@ -2302,7 +2302,293 @@ const MAX_MSG    = 20;
    NAVIGATION
 ════════════════════════════════ */
 var ALL_SCREENS = ['landing','home','sim','results','history','manager-setup','manager-dashboard','commercial-entry'];
+/* ════════════════════════════════
+   ÉTAT NOUVELLE SIMULATION
+════════════════════════════════ */
+var selectedNiveau    = null;
+var selectedSituation = null;
+var selectedMode      = null;
+var selectedArchetype = null;
 
+/* ════════════════════════════════
+   ÉTAPE 1
+════════════════════════════════ */
+function goStep1() {
+  document.getElementById('step-1').style.display = 'flex';
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'none';
+}
+
+function selectNiveau(niv) {
+  selectedNiveau = niv;
+  ['debutant','intermediaire','expert'].forEach(function(n) {
+    var el = document.getElementById('niv-' + n);
+    if (!el) return;
+    el.style.borderColor   = n === niv ? 'var(--accent)' : 'var(--border2)';
+    el.style.background    = n === niv ? 'rgba(212,132,26,.08)' : 'transparent';
+  });
+}
+
+function resetNiveauHover(el, niv) {
+  if (selectedNiveau !== niv) el.style.borderColor = 'var(--border2)';
+}
+
+function goStep2() {
+  var produit = (document.getElementById('input-produit').value || '').trim();
+  var cible   = (document.getElementById('input-cible').value || '').trim();
+  if (!produit || !cible) {
+    alert('Remplissez ce que vous vendez et à qui vous vendez.');
+    return;
+  }
+  if (!selectedNiveau) {
+    alert('Choisissez votre niveau.');
+    return;
+  }
+
+  // Rendre les situations
+  var container = document.getElementById('situations-list');
+  container.innerHTML = Object.keys(SITUATIONS).map(function(key) {
+    var sit = SITUATIONS[key];
+    return '<div onclick="selectSituation(\'' + key + '\')" id="sit-' + key + '" style="border:1px solid var(--border2);padding:20px 24px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="resetSituationHover(this,\'' + key + '\')">' +
+      '<div>' +
+        '<div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:4px">' + sit.nom + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + sit.description + '</div>' +
+      '</div>' +
+      '<div style="font-size:18px;color:var(--muted)">→</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-2').style.display = 'flex';
+  document.getElementById('step-3').style.display = 'none';
+}
+
+function selectSituation(key) {
+  selectedSituation = key;
+  Object.keys(SITUATIONS).forEach(function(k) {
+    var el = document.getElementById('sit-' + k);
+    if (!el) return;
+    el.style.borderColor = k === key ? 'var(--accent)' : 'var(--border2)';
+    el.style.background  = k === key ? 'rgba(212,132,26,.08)' : 'transparent';
+  });
+}
+
+function resetSituationHover(el, key) {
+  if (selectedSituation !== key) el.style.borderColor = 'var(--border2)';
+}
+
+/* ════════════════════════════════
+   ÉTAPE 3
+════════════════════════════════ */
+function goStep3() {
+  if (!selectedSituation) {
+    alert('Choisissez une situation.');
+    return;
+  }
+
+  // Rendre les archétypes
+  var grid = document.getElementById('archetypes-grid');
+  grid.innerHTML = Object.keys(ARCHETYPES).map(function(key) {
+    var arch = ARCHETYPES[key];
+    return '<div onclick="selectArchetype(\'' + key + '\')" id="arch-' + key + '" style="border:1px solid var(--border2);padding:18px 22px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:16px" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="resetArchHover(this,\'' + key + '\')">' +
+      '<div style="font-size:28px;flex-shrink:0">' + arch.icon + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:3px">' + arch.nom + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + arch.description + '</div>' +
+      '</div>' +
+      '<div style="font-size:16px;color:var(--muted)">→</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('step-1').style.display = 'none';
+  document.getElementById('step-2').style.display = 'none';
+  document.getElementById('step-3').style.display = 'flex';
+
+  // Reset mode
+  selectedMode      = null;
+  selectedArchetype = null;
+  document.getElementById('archetypes-grid').style.display  = 'none';
+  document.getElementById('info-aleatoire').style.display   = 'none';
+  document.getElementById('info-progression').style.display = 'none';
+}
+
+function selectMode(mode) {
+  selectedMode = mode;
+  ['cible','aleatoire','progression'].forEach(function(m) {
+    var el = document.getElementById('mode-' + m);
+    if (!el) return;
+    el.style.borderColor = m === mode ? 'var(--accent)' : 'var(--border2)';
+    el.style.background  = m === mode ? 'rgba(212,132,26,.08)' : 'transparent';
+  });
+
+  document.getElementById('archetypes-grid').style.display  = mode === 'cible'       ? 'flex'  : 'none';
+  document.getElementById('info-aleatoire').style.display   = mode === 'aleatoire'   ? 'block' : 'none';
+  document.getElementById('info-progression').style.display = mode === 'progression' ? 'block' : 'none';
+
+  if (mode === 'progression') analyserProgression();
+}
+
+function selectArchetype(key) {
+  selectedArchetype = key;
+  Object.keys(ARCHETYPES).forEach(function(k) {
+    var el = document.getElementById('arch-' + k);
+    if (!el) return;
+    el.style.borderColor = k === key ? 'var(--accent)' : 'var(--border2)';
+    el.style.background  = k === key ? 'rgba(212,132,26,.08)' : 'transparent';
+  });
+}
+
+function resetArchHover(el, key) {
+  if (selectedArchetype !== key) el.style.borderColor = 'var(--border2)';
+}
+
+/* ════════════════════════════════
+   MODE PROGRESSION
+════════════════════════════════ */
+function analyserProgression() {
+  var hist = getHistory();
+  var el   = document.getElementById('progression-text');
+
+  if (hist.length < 3) {
+    el.innerHTML = 'Pas encore assez de sessions pour analyser vos faiblesses.<br><span style="color:var(--accent)">Faites au moins 3 simulations pour débloquer ce mode.</span>';
+    selectedArchetype = null;
+    return;
+  }
+
+  // Calculer le score moyen par critère
+  var totaux = { accroche:0, ecoute:0, argumentation:0, objections:0, closing:0 };
+  hist.slice(0, 10).forEach(function(h) {
+    if (!h.scores) return;
+    Object.keys(totaux).forEach(function(k) {
+      totaux[k] += (h.scores[k] || 0);
+    });
+  });
+  var n = Math.min(hist.length, 10);
+  Object.keys(totaux).forEach(function(k) { totaux[k] = Math.round(totaux[k] / n); });
+
+  // Trouver le point le plus faible
+  var minKey = Object.keys(totaux).reduce(function(a, b) {
+    return totaux[a] < totaux[b] ? a : b;
+  });
+
+  // Mapper le point faible vers un archétype
+  var mapping = {
+    accroche:      'presse',
+    ecoute:        'dominant',
+    argumentation: 'comparateur',
+    objections:    'negociateur',
+    closing:       'indecis'
+  };
+
+  var labels = {
+    accroche:'Accroche', ecoute:'Écoute', argumentation:'Argumentation',
+    objections:'Objections', closing:'Closing'
+  };
+
+  selectedArchetype = mapping[minKey];
+
+  el.innerHTML = 'Votre point faible : <span style="color:var(--red);font-weight:500">' + labels[minKey] + ' (' + totaux[minKey] + '/100)</span><br>' +
+    'Prospect assigné : <span style="color:var(--accent);font-weight:500">' + ARCHETYPES[selectedArchetype].nom + '</span><br>' +
+    '<span style="color:var(--muted);font-size:10px">Ce prospect va spécifiquement tester votre ' + labels[minKey].toLowerCase() + '.</span>';
+}
+
+/* ════════════════════════════════
+   LANCEMENT SIMULATION
+════════════════════════════════ */
+function lancerSimulation() {
+  if (!selectedMode) {
+    alert('Choisissez un mode.');
+    return;
+  }
+  if (selectedMode === 'cible' && !selectedArchetype) {
+    alert('Choisissez un archétype de prospect.');
+    return;
+  }
+  if (selectedMode === 'progression' && !selectedArchetype) {
+    alert('Pas encore assez de sessions. Faites d\'abord 3 simulations.');
+    return;
+  }
+
+  // Archétype final
+  var archetypeFinal = selectedArchetype;
+  if (selectedMode === 'aleatoire') {
+    var keys = Object.keys(ARCHETYPES);
+    archetypeFinal = keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  var produit = (document.getElementById('input-produit').value || '').trim();
+  var cible   = (document.getElementById('input-cible').value || '').trim();
+  var prenom  = genererPrenom(archetypeFinal);
+
+  currentConfig = {
+    produit:    produit,
+    cible:      cible,
+    niveau:     selectedNiveau,
+    situation:  selectedSituation,
+    archetype:  archetypeFinal,
+    prenom:     prenom,
+    mode:       selectedMode
+  };
+
+  // Construire l'objet current pour compatibilité avec le reste du code
+  var arch = ARCHETYPES[archetypeFinal];
+  var sit  = SITUATIONS[selectedSituation];
+
+  current = {
+    name:       sit.nom + ' — ' + arch.nom,
+    prospect: {
+      name: prenom,
+      role: arch.nom + ' · ' + cible,
+      av:   prenom.substring(0, 2).toUpperCase()
+    },
+    brief: [
+      { k:'Produit',      v: produit },
+      { k:'Cible',        v: cible },
+      { k:'Situation',    v: sit.nom },
+      { k:'Archétype',    v: arch.nom },
+      { k:'Déclencheur',  v: arch.declencheurPositif }
+    ],
+    tips: [
+      'Faiblesse du prospect : ' + arch.faiblesseCommercial,
+      'Ce qui l\'engage : ' + arch.declencheurPositif,
+      sit.contexte
+    ],
+    objective:  sit.contexte,
+    context:    sit.contexte,
+    killwords:  [arch.faiblesseCommercial],
+    systemPrompt: genererSystemPrompt(currentConfig)
+  };
+
+  currentKey = archetypeFinal;
+
+  // Reset état
+  conversation = [];
+  msgCount     = 0;
+  scores       = { accroche:30, ecoute:30, argumentation:30, objections:30, closing:30 };
+  mood         = { interet:25, confiance:20, urgence:15 };
+
+  // Header simulation
+  document.getElementById('sim-title').textContent = current.name;
+  document.getElementById('sim-av').textContent    = current.prospect.av;
+  document.getElementById('sim-name').textContent  = current.prospect.name;
+  document.getElementById('sim-role').textContent  = current.prospect.role;
+
+  // Chat vide
+  document.getElementById('chat-log').innerHTML = '';
+
+  // Sidebar
+  renderBrief();
+  renderMood();
+  renderScores();
+  renderTips();
+  updateCounter();
+
+  // Lancer directement sans overlay objectif
+  show('sim');
+  startTimer();
+  addSys('Simulation démarrée — ' + current.name);
+  prospectFirst();
+}
 function showScreen(id) {
   ALL_SCREENS.forEach(function(s) {
     var el = document.getElementById(s);
