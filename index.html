@@ -2620,7 +2620,9 @@ function goHome() {
   }
   var status = document.getElementById('voice-status');
   if (status) status.textContent = '';
-  show('landing');
+  // Retour à l'écran home avec étape 1
+  show('home');
+  goStep1();
 }
 
 /* ════════════════════════════════
@@ -2758,7 +2760,10 @@ function renderHistory() {
   });
   tableEl.innerHTML = header + rows.join('');
 }
-function replay() { if (currentKey) launch(currentKey); }
+function replay() {
+  show('home');
+  goStep1();
+}
 
 /* ════════════════════════════════
    LANCEMENT SCÉNARIO
