@@ -2324,8 +2324,9 @@ function selectNiveau(niv) {
   ['debutant','intermediaire','expert'].forEach(function(n) {
     var el = document.getElementById('niv-' + n);
     if (!el) return;
-    el.style.borderColor   = n === niv ? 'var(--accent)' : 'var(--border2)';
-    el.style.background    = n === niv ? 'rgba(212,132,26,.08)' : 'transparent';
+    el.style.borderColor = n === niv ? 'var(--accent)' : 'var(--border2)';
+    el.style.background  = n === niv ? 'rgba(212,132,26,.08)' : 'transparent';
+    el.style.color       = n === niv ? 'var(--ink)' : '';
   });
 }
 
@@ -2361,8 +2362,8 @@ function goStep2() {
   document.getElementById('step-1').style.display = 'none';
   document.getElementById('step-2').style.display = 'flex';
   document.getElementById('step-3').style.display = 'none';
+  window.scrollTo(0, 0);
 }
-
 function selectSituation(key) {
   selectedSituation = key;
   Object.keys(SITUATIONS).forEach(function(k) {
