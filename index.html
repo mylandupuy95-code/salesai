@@ -3284,17 +3284,22 @@ Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans texte av
 }`;
 
   let data;
-  try {
+ try {
     const raw = await claude(
       [{ role: 'user', content: scoringPrompt }],
       scoringSystem
     );
+    console.log('RAW SCORING:', raw);
     try {
-      data = JSON.parse(raw.replace(/```json|```/g, '').trim());
-    } catch {
+      const cleaned = raw.replace(/```json|```/g, '').trim();
+      data = JSON.parse(cleaned);
+      console.log('SCORING PARSED OK:', data.score_global);
+    } catch(parseErr) {
+      console.error('SCORING PARSE ERROR:', parseErr, 'RAW:', raw);
       data = fallback();
     }
-  } catch {
+  } catch(apiErr) {
+    console.error('SCORING API ERROR:', apiErr);
     data = fallback();
   }
 
