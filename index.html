@@ -2594,6 +2594,17 @@ function lancerSimulation() {
   renderTips();
   updateCounter();
 
+  // Réinitialiser l'input
+  var txt = document.getElementById('txt');
+  var btnSend = document.getElementById('btn-send');
+  if (txt) {
+    txt.disabled = false;
+    txt.value = '';
+    txt.placeholder = 'Répondez naturellement...';
+    txt.style.opacity = '1';
+  }
+  if (btnSend) btnSend.disabled = false;
+
   // Lancer directement sans overlay objectif
   show('sim');
   startTimer();
