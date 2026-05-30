@@ -3227,8 +3227,8 @@ async function endSim() {
 
   // Reconstituer le transcript lisible depuis la conversation
   // On filtre le message d'amorce initial
-  const transcript = conversation
-    .filter(m => m.content !== 'DEBUT_SIMULATION')
+ const transcript = conversation
+    .filter(m => !m.content.startsWith('DEBUT_SIMULATION'))
     .map(m => (m.role === 'user' ? 'COMMERCIAL' : 'PROSPECT') + ' : ' + m.content.split('[Rappel interne')[0].trim())
     .join('\n\n');
 
@@ -3496,8 +3496,8 @@ function renderResults(d) {
   }
 
   // Replay transcript section
-  var cleanTranscript = conversation
-    .filter(function(m) { return m.content !== 'DEBUT_SIMULATION'; })
+ var cleanTranscript = conversation
+    .filter(function(m) { return !m.content.startsWith('DEBUT_SIMULATION'); })
     .map(function(m) {
       return { role: m.role, text: m.content.split('[Rappel interne')[0].trim() };
     })
