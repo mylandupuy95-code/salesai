@@ -2936,25 +2936,46 @@ function scroll() {
    APPEL CLAUDE API
 ════════════════════════════════ */
 async function claude(messages, system) {
-  const groqMessages = [
-    { role: 'system', content: system },
-    ...messages
-  ];
-  const r = await fetch('https://delicate-sun-5cc0.mylan-dupuy95.workers.dev/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 1000,
-      temperature: 0.92,
-      messages: groqMessages
-    })
-  });
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message);
-  return d.choices[0].message.content;
-}
+  try {
+    const r = await fetch('https://delicate-sun-5cc0.mylan-dupuy95.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        temperature: 0.92,
+        messages: [
+          { role: 'system', content: system },
+          ...messages
+        ]
+      })
+    });
 
+    if (!r.ok) {
+      const errText = await r.text();
+      console.error('API Error:', r.status, errText);
+      throw new Error('API Error: ' + r.status);
+    }
+
+    const d = await r.json();
+
+    if (d.error) {
+      console.error('Groq Error:', d.error);
+      throw new Error(d.error.message || 'Groq error');
+    }
+
+    if (!d.choices || !d.choices[0] || !d.choices[0].message) {
+      console.error('Réponse inattendue:', JSON.stringify(d));
+      throw new Error('Réponse invalide');
+    }
+
+    return d.choices[0].message.content;
+
+  } catch(e) {
+    console.error('claude() error:', e);
+    throw e;
+  }
+}
 /* ════════════════════════════════
    PREMIER MESSAGE DU PROSPECT
 ════════════════════════════════ */
@@ -2962,10 +2983,7 @@ async function prospectFirst() {
   document.getElementById('btn-send').disabled = true;
   showTyping();
 
-  // L'API Anthropic doit avoir un message user en premier.
-  // On injecte un message "amorce" invisible qui demande au prospect d'ouvrir.
-  var productNote = userProduct ? " Le commercial te vend : " + userProduct + ". Adapte tes questions et objections a ce produit specifique." : "";
-  const amorce = "DEBUT_SIMULATION. Tu es " + current.prospect.name + "." + productNote + " " + getDiffInstruction() + " La simulation commence. Lance ta premiere replique, naturelle, dans le personnage. Varie ton ouverture. 3 phrases max.";
+  var amorce = "DEBUT_SIMULATION. Tu es " + current.prospect.name + ". La simulation commence maintenant. Lance ta première réplique naturellement, dans le personnage. 2-3 phrases max. Pas de présentation, pas de bonjour formel — commence directement comme si le commercial venait d'appeler ou d'entrer.";
 
   try {
     const reply = await claude(
@@ -2974,22 +2992,23 @@ async function prospectFirst() {
     );
     removeTyping();
     addMsg(reply, 'p');
-    // On stocke : le commercial n'a encore rien dit.
-    // Pour l'API on a : user=amorce / assistant=reply
-    // On gardera la conversation RÉELLE séparément
     conversation = [{ role: 'user', content: amorce }, { role: 'assistant', content: reply }];
-  } catch (e) {
+  } catch(e) {
     removeTyping();
-    const fallbacks = {
-      cold:      "Oui, j'ecoute — mais faites vite, j'ai une reunion dans huit minutes.",
-      demo:      "Bonjour. Vous avez vingt minutes. Je vous ecoute.",
-      objection: "Bonjour. On m'a dit que vous aviez quelque chose d'interessant. Allez-y.",
-      closing:   "Bonjour. On devait se rappeler... Alors, ou en sommes-nous ?"
+    var fallbacks = {
+      mefiant:     "Oui, j'écoute. Vous avez deux minutes.",
+      presse:      "Oui ? Faites vite, je suis débordé.",
+      comparateur: "Bonjour. J'écoute, mais j'ai déjà plusieurs offres sur la table.",
+      indecis:     "Ah oui, bonjour... je vous écoutais justement.",
+      negociateur: "Oui, allô. Vous avez quelque chose à me proposer ?",
+      dominant:    "Oui. Qu'est-ce que vous avez de différent des autres ?"
     };
-    const fb = fallbacks[currentKey] || "Oui, allô, j'ecoute.";
+    var fb = fallbacks[currentKey] || "Oui, j'écoute.";
     addMsg(fb, 'p');
-    conversation = [{ role: 'user', content: 'DEBUT_SIMULATION' }, { role: 'assistant', content: fb }];
+    conversation = [{ role: 'user', content: amorce }, { role: 'assistant', content: fb }];
+    console.log('Erreur prospectFirst:', e);
   }
+
   document.getElementById('btn-send').disabled = false;
   document.getElementById('txt').focus();
 }
