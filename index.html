@@ -2279,26 +2279,6 @@ let mood           = { interet:25, confiance:20, urgence:15 };
 const MAX_MSG      = 20;
 
 /* ════════════════════════════════
-   ÉTAT GLOBAL
-════════════════════════════════ */
-let currentKey   = null;
-let current      = null;
-let currentDiff  = 2; // Controlled by scenario: 1=cold 2=demo 3=objection 4=closing
-let userProduct  = ''; // What the user is selling
-let timerInterval = null;
-let timerSeconds  = 0;
-let replayFromIndex = -1; // index in conversation to replay from
-// conversation stocke les vrais échanges pour l'API
-// format strict : alternance user/assistant
-// user = ce que dit le commercial
-// assistant = ce que répond le prospect
-let conversation = [];
-let msgCount     = 0;
-let scores       = { accroche:30, ecoute:30, argumentation:30, objections:30, closing:30 };
-let mood         = { interet:25, confiance:20, urgence:15 };
-const MAX_MSG    = 20;
-
-/* ════════════════════════════════
    NAVIGATION
 ════════════════════════════════ */
 var ALL_SCREENS = ['landing','home','sim','results','history','manager-setup','manager-dashboard','commercial-entry'];
