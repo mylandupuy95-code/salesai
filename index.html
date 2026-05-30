@@ -2860,8 +2860,11 @@ async function startSimNow() {
  var productNote = currentConfig ? " Le commercial te vend : " + currentConfig.produit + ". Tu es : " + currentConfig.cible + ". Adapte tes questions et objections à ce contexte précis." : "";
   document.getElementById('obj-overlay').classList.remove('visible');
   startTimer();
-addSys('Simulation démarrée — ' + current.name);
-  var msgAvecNote = txt + "\n\n[Rappel interne : échange " + msgCount + "/" + MAX_MSG + ". Produit : " + (currentConfig ? currentConfig.produit : '') + ". Reste dans le personnage. Fais évoluer ton état émotionnel selon la qualité de ce message. JAMAIS la même formulation deux fois. 3-4 phrases max.]";  await prospectFirst();
+async function startSimNow() {
+  document.getElementById('obj-overlay').classList.remove('visible');
+  startTimer();
+  addSys('Simulation démarrée — ' + current.name);
+  await prospectFirst();
 }
 
 /* ════════════════════════════════
