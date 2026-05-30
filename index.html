@@ -3484,8 +3484,7 @@ function renderResults(d) {
 var mgrData={name:'',teamName:'',sector:'',teamCode:'',members:[]};
 var commercialData={name:'',teamCode:'',isTeamMember:false};
 
-function enterIndividual(){showScreen('home');}
-
+function enterIndividual(){ showScreen('home'); goStep1(); }
 function enterManager(){
   try{
     var s=JSON.parse(localStorage.getItem('salesai_manager')||'null');
