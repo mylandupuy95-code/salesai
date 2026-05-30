@@ -3223,7 +3223,7 @@ async function endSim() {
 var messagesCommercial = conversation.filter(function(m) {
   return m.role === 'user' && !m.content.startsWith('DEBUT_SIMULATION');
 });
-if (messagesCommercial.length === 0) {
+if (messagesCommercial.length < 2) {
   document.getElementById('loader').classList.remove('on');
   saveToHistory({
     score_global: 0,
@@ -3274,6 +3274,9 @@ TRANSCRIPT COMPLET :
 ${transcript}
 
 ---
+ATTENTION CRITIQUE : Analyse UNIQUEMENT les messages du COMMERCIAL (lignes "COMMERCIAL :"). 
+Les messages du PROSPECT ne comptent PAS dans l'évaluation du commercial.
+Si le COMMERCIAL n'a envoyé aucun message ou moins de 2 messages, mets score_global à 0 et tous les scores à 0.
 Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans texte avant ou après :
 {
   "score_global": <entier 0-100>,
