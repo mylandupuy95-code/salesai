@@ -2806,10 +2806,10 @@ function showObjective() {
 }
 
 async function startSimNow() {
-  userProduct = (document.getElementById('product-input').value || '').trim();
+ var productNote = currentConfig ? " Le commercial te vend : " + currentConfig.produit + ". Tu es : " + currentConfig.cible + ". Adapte tes questions et objections à ce contexte précis." : "";
   document.getElementById('obj-overlay').classList.remove('visible');
   startTimer();
-  addSys('Simulation démarrée — ' + current.name + (userProduct ? ' · Produit : ' + userProduct : ''));
+  addSys('Simulation démarrée — ' var msgAvecNote = txt + "\n\n[Rappel interne : échange " + msgCount + "/" + MAX_MSG + ". Produit : " + (currentConfig ? currentConfig.produit : '') + ". Reste dans le personnage. Fais évoluer ton état émotionnel selon la qualité de ce message. JAMAIS la même formulation deux fois. 3-4 phrases max.]";
   await prospectFirst();
 }
 
@@ -2983,7 +2983,9 @@ async function prospectFirst() {
   document.getElementById('btn-send').disabled = true;
   showTyping();
 
-  var amorce = "DEBUT_SIMULATION. Tu es " + current.prospect.name + ". La simulation commence maintenant. Lance ta première réplique naturellement, dans le personnage. 2-3 phrases max. Pas de présentation, pas de bonjour formel — commence directement comme si le commercial venait d'appeler ou d'entrer.";
+ var produit = currentConfig ? currentConfig.produit : '';
+var cible = currentConfig ? currentConfig.cible : '';
+var amorce = "DEBUT_SIMULATION. Tu es " + current.prospect.name + ". Le commercial te vend : " + produit + ". Tu es : " + cible + ". La simulation commence maintenant. Lance ta première réplique naturellement, dans le personnage. 2-3 phrases max. Pas de présentation, pas de bonjour formel — commence directement comme si le commercial venait d'appeler ou d'entrer.";
 
   try {
     const reply = await claude(
@@ -3088,7 +3090,7 @@ async function send() {
   // On ajoute le message du commercial dans la conversation
   // L'API attend : [...historique, { role:'user', content: message_commercial }]
   // Le dernier message doit toujours être role:'user'
-  var prodReminder = userProduct ? " Produit vendu : " + userProduct + "." : "";
+ var prodReminder = currentConfig ? " Produit : " + currentConfig.produit + "." : "";
   const msgAvecNote = txt + "\n\n[Rappel interne - ne pas afficher : echange " + msgCount + "/" + MAX_MSG + "." + prodReminder + " " + getDiffInstruction() + " Reponds en tenant compte de TOUT ce qui a ete dit avant. Fais evoluer ton etat emotionnel selon la qualite de ce message. JAMAIS la meme formulation deux fois. 3-4 phrases max, naturel et humain.]";
 
   conversation.push({ role: 'user', content: msgAvecNote });
@@ -3188,7 +3190,7 @@ async function endSim() {
     .map(m => (m.role === 'user' ? 'COMMERCIAL' : 'PROSPECT') + ' : ' + m.content.split('[Rappel interne')[0].trim())
     .join('\n\n');
 
-  var productCtx = userProduct ? 'PRODUIT VENDU : ' + userProduct : 'PRODUIT : non spécifié (simulation générique)';
+  var productCtx = currentConfig ? 'PRODUIT VENDU : ' + currentConfig.produit + ' — CIBLE : ' + currentConfig.cible : 'PRODUIT : non spécifié';
 
   const scoringSystem = `Tu es un directeur commercial senior avec 25 ans d'expérience en vente B2B complexe. Tu coachais des équipes commerciales dans des entreprises du CAC 40. Tu es reconnu pour tes débriefings précis, honnêtes et sans complaisance.`;
 
@@ -3612,7 +3614,9 @@ function launchCustomScenario(idx){
   var sc=customs[idx];if(!sc)return;
   currentKey='custom';
   current={name:sc.name,prospect:{name:sc.prospectProfile.split(',')[0].trim(),role:sc.prospectProfile,av:sc.prospectProfile.substring(0,2).toUpperCase()},brief:[{k:'Profil',v:sc.prospectProfile},{k:'Produit',v:sc.product||'—'},{k:'Objectif',v:sc.goal}],tips:['Adaptez votre pitch au profil exact','Préparez les objections connues','Restez dans le contexte secteur'],systemPrompt:sc.systemPrompt,objective:sc.goal,context:'Scénario personnalisé — '+sc.prospectProfile,killwords:(sc.objections||'').split('/').slice(0,3).map(function(s){return s.trim();}).filter(Boolean)};
-  userProduct=sc.product||'';
+ if (!currentConfig) currentConfig = {};
+currentConfig.produit = sc.product || '';
+currentConfig.cible = sc.prospectProfile || '';
   history=[];conversation=[];msgCount=0;
   scores={accroche:30,ecoute:30,argumentation:30,objections:30,closing:30};
   mood={interet:25,confiance:20,urgence:15};currentDiff=2;
