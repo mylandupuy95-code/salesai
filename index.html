@@ -2857,10 +2857,6 @@ function showObjective() {
 }
 
 async function startSimNow() {
- var productNote = currentConfig ? " Le commercial te vend : " + currentConfig.produit + ". Tu es : " + currentConfig.cible + ". Adapte tes questions et objections à ce contexte précis." : "";
-  document.getElementById('obj-overlay').classList.remove('visible');
-  startTimer();
-async function startSimNow() {
   document.getElementById('obj-overlay').classList.remove('visible');
   startTimer();
   addSys('Simulation démarrée — ' + current.name);
