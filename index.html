@@ -2587,28 +2587,38 @@ function lancerSimulation() {
   // Chat vide
   document.getElementById('chat-log').innerHTML = '';
 
-  // Sidebar
+ // Sidebar
   renderBrief();
   renderMood();
   renderScores();
   renderTips();
   updateCounter();
 
-  // Réinitialiser l'input
-  var txt = document.getElementById('txt');
-  var btnSend = document.getElementById('btn-send');
-  if (txt) {
-    txt.disabled = false;
-    txt.value = '';
-    txt.placeholder = 'Répondez naturellement...';
-    txt.style.opacity = '1';
-  }
-  if (btnSend) btnSend.disabled = false;
-
-  // Lancer directement sans overlay objectif
+  // Lancer directement
   show('sim');
   startTimer();
   addSys('Simulation démarrée — ' + current.name);
+
+  // Réinitialiser l'input APRÈS show
+  setTimeout(function() {
+    var txtEl = document.getElementById('txt');
+    var btnEl = document.getElementById('btn-send');
+    if (txtEl) {
+      txtEl.disabled = false;
+      txtEl.value = '';
+      txtEl.placeholder = 'Répondez naturellement...';
+      txtEl.style.opacity = '1';
+      txtEl.style.pointerEvents = 'auto';
+      txtEl.removeAttribute('disabled');
+    }
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.style.opacity = '1';
+      btnEl.style.pointerEvents = 'auto';
+      btnEl.removeAttribute('disabled');
+    }
+  }, 100);
+
   prospectFirst();
 }
 function showScreen(id) {
@@ -3180,11 +3190,29 @@ async function send() {
    FIN D'APPEL PRÉMATURÉE
 ════════════════════════════════ */
 function triggerCallEnd(type, reason) {
-  // Bloquer l'input
+  stopTimer();
   document.getElementById('btn-send').disabled = true;
   document.getElementById('txt').disabled = true;
-  document.getElementById('txt').placeholder = 'Appel terminé.';
+  document.getElementById('txt').placeholder = 'Simulation terminée.';
 
+  const log = document.getElementById('chat-log');
+  const endBanner = document.createElement('div');
+  endBanner.style.cssText = 'margin:24px auto;padding:20px 28px;border:1px solid;text-align:center;max-width:400px;';
+
+  if (type === 'lost') {
+    endBanner.style.borderColor = 'var(--red)';
+    endBanner.style.background = 'rgba(184,64,64,0.08)';
+    endBanner.innerHTML = '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:8px">APPEL TERMINÉ — PROSPECT A RACCROCHÉ</div><div style="font-size:13px;color:var(--ink2);font-style:italic">"' + reason + '"</div>';
+  } else if (type === 'won') {
+    endBanner.style.borderColor = 'var(--green)';
+    endBanner.style.background = 'rgba(74,154,106,0.08)';
+    endBanner.innerHTML = '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:8px">OBJECTIF ATTEINT</div><div style="font-size:13px;color:var(--ink2);font-style:italic">"' + reason + '"</div>';
+  }
+
+  log.appendChild(endBanner);
+  scroll();
+  setTimeout(endSim, 1500);
+}
   // Afficher le bandeau de fin
   const log = document.getElementById('chat-log');
   const endBanner = document.createElement('div');
