@@ -3219,7 +3219,38 @@ async function endSim() {
   stopTimer();
   document.getElementById('btn-send').disabled = true;
   document.getElementById('loader').classList.add('on');
-
+// Si le commercial n'a rien dit ou presque
+var messagesCommercial = conversation.filter(function(m) {
+  return m.role === 'user' && !m.content.startsWith('DEBUT_SIMULATION');
+});
+if (messagesCommercial.length === 0) {
+  document.getElementById('loader').classList.remove('on');
+  saveToHistory({
+    score_global: 0,
+    verdict: "Vous n'avez rien dit. La simulation ne peut pas être évaluée.",
+    scores: { accroche:0, ecoute:0, argumentation:0, objections:0, closing:0 },
+    resultat: "DEAL PERDU",
+    points_forts: ["—", "—", "—"],
+    erreurs: ["Vous n'avez envoyé aucun message", "Impossible d'évaluer sans participation", "Lancez une vraie simulation pour obtenir un débriefing"],
+    pensee_prospect: "Ce commercial n'a rien dit. Je n'ai aucune idée de ce qu'il voulait.",
+    conseil: "Participez activement à la simulation pour obtenir un vrai débriefing.",
+    vs_humain: { intro: "Sans participation, aucune comparaison n'est possible.", differences: ["—", "—", "—"] },
+    reformulations: []
+  });
+  renderResults({
+    score_global: 0,
+    verdict: "Vous n'avez rien dit. La simulation ne peut pas être évaluée.",
+    scores: { accroche:0, ecoute:0, argumentation:0, objections:0, closing:0 },
+    resultat: "DEAL PERDU",
+    points_forts: ["—", "—", "—"],
+    erreurs: ["Vous n'avez envoyé aucun message", "Impossible d'évaluer sans participation", "Lancez une vraie simulation pour obtenir un vrai débriefing"],
+    pensee_prospect: "Ce commercial n'a rien dit. Je n'ai aucune idée de ce qu'il voulait.",
+    conseil: "Participez activement à la simulation pour obtenir un vrai débriefing.",
+    vs_humain: { intro: "Sans participation, aucune comparaison n'est possible.", differences: ["—", "—", "—"] },
+    reformulations: []
+  });
+  return;
+}
   // Reconstituer le transcript lisible depuis la conversation
   // On filtre le message d'amorce initial
  const transcript = conversation
