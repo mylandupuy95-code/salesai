@@ -3130,27 +3130,25 @@ async function send() {
     removeTyping();
 
     // Détecter si le prospect raccroche ou conclut
-    if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:')) {
-      const reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').trim();
-      addMsg(reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').trim(), 'p');
+   if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:') || reply.includes('RACCROCHÉ') || reply.includes('RACCROCHE')) {
+      var reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').replace('RACCROCHÉ', '').replace('RACCROCHE', '').trim();
+      addMsg(reason, 'p');
       conversation.push({ role: 'assistant', content: reply });
-      setTimeout(() => triggerCallEnd('lost', reason), 1200);
+      document.getElementById('btn-send').disabled = true;
+      document.getElementById('txt').disabled = true;
+      document.getElementById('txt').placeholder = 'Simulation terminée.';
+      setTimeout(function() { triggerCallEnd('lost', reason); }, 1500);
       return;
     }
 
-    if (reply.startsWith('RDV OBTENU:')) {
-      const detail = reply.replace('RDV OBTENU:', '').trim();
+    if (reply.startsWith('OBJECTIF ATTEINT:') || reply.includes('OBJECTIF ATTEINT')) {
+      var detail = reply.replace('OBJECTIF ATTEINT:', '').replace('OBJECTIF ATTEINT', '').trim();
       addMsg(detail, 'p');
       conversation.push({ role: 'assistant', content: reply });
-      setTimeout(() => triggerCallEnd('rdv', detail), 1200);
-      return;
-    }
-
-    if (reply.startsWith('DEAL SIGNÉ:') || reply.startsWith('DEAL AVANCÉ:') || reply.startsWith('DEAL SIGNE:')) {
-      const detail = reply.replace('DEAL SIGNÉ:', '').replace('DEAL AVANCÉ:', '').replace('DEAL SIGNE:', '').trim();
-      addMsg(detail, 'p');
-      conversation.push({ role: 'assistant', content: reply });
-      setTimeout(() => triggerCallEnd('won', detail), 1200);
+      document.getElementById('btn-send').disabled = true;
+      document.getElementById('txt').disabled = true;
+      document.getElementById('txt').placeholder = 'Simulation terminée.';
+      setTimeout(function() { triggerCallEnd('won', detail); }, 1500);
       return;
     }
 
@@ -3818,13 +3816,27 @@ async function sendVoice(text) {
     removeTyping();
 
     // Vérifier raccroché
-    if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:')) {
-      var reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').trim();
+   if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:') || reply.includes('RACCROCHÉ') || reply.includes('RACCROCHE')) {
+      var reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').replace('RACCROCHÉ', '').replace('RACCROCHE', '').trim();
       addMsg(reason, 'p');
       conversation.push({ role: 'assistant', content: reply });
-      await speakText(reason);
+      document.getElementById('btn-send').disabled = true;
+      document.getElementById('txt').disabled = true;
+      document.getElementById('txt').placeholder = 'Simulation terminée.';
       stopVoiceMode();
-      setTimeout(function() { triggerCallEnd('lost', reason); }, 500);
+      setTimeout(function() { triggerCallEnd('lost', reason); }, 1500);
+      return;
+    }
+
+    if (reply.startsWith('OBJECTIF ATTEINT:') || reply.includes('OBJECTIF ATTEINT')) {
+      var detail = reply.replace('OBJECTIF ATTEINT:', '').replace('OBJECTIF ATTEINT', '').trim();
+      addMsg(detail, 'p');
+      conversation.push({ role: 'assistant', content: reply });
+      document.getElementById('btn-send').disabled = true;
+      document.getElementById('txt').disabled = true;
+      document.getElementById('txt').placeholder = 'Simulation terminée.';
+      stopVoiceMode();
+      setTimeout(function() { triggerCallEnd('won', detail); }, 1500);
       return;
     }
 
