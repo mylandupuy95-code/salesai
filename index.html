@@ -2240,9 +2240,8 @@ function genererSystemPrompt(config) {
 
   var tol = toleranceParArchetype[config.archetype];
   var niv = toleranceParNiveau[niveau];
-
-  return `Tu es ${prenom}, un prospect réel dans une simulation de vente. NIVEAU DE DIFFICULTÉ : ${niv.difficulte}
-
+var dureeLabel = DUREES_SITUATION[config.situation] ? DUREES_SITUATION[config.situation].label : '10 minutes';
+ Tu es ${prenom}, un prospect réel dans une simulation de vente. NIVEAU DE DIFFICULTÉ : ${niv.difficulte} — DURÉE IMPARTIE : ${dureeLabel} maximum. Tu es conscient du temps qui passe. Vers 70% du temps tu montres de l'impatience naturelle. Vers 90% tu annonces que tu dois partir. Tu ne raccroches PAS brutalement — tu envoies des signaux progressifs avant de conclure.
 CONTEXTE DE VENTE :
 Le commercial essaie de te vendre : ${produit}
 Tu es : ${cible}
@@ -2305,7 +2304,32 @@ let conversation   = [];
 let msgCount       = 0;
 let scores         = { accroche:30, ecoute:30, argumentation:30, objections:30, closing:30 };
 let mood           = { interet:25, confiance:20, urgence:15 };
-const MAX_MSG      = 20;
+const MAX_MSG = 20;
+
+// Durées en secondes par situation
+const DUREES_SITUATION = {
+  premier_contact:    { base: 240,  label: "4 minutes" },   // 4 min
+  prospect_chaud:     { base: 1200, label: "20 minutes" },  // 20 min
+  prospect_resistant: { base: 420,  label: "7 minutes" },   // 7 min
+  decision_urgente:   { base: 720,  label: "12 minutes" }   // 12 min
+};
+
+// Multiplicateurs par profil détecté
+function getMultiplicateurProfil(cible) {
+  var cibleLow = (cible || '').toLowerCase();
+  if (/patron|pdg|dg|directeur|ceo|président|président/.test(cibleLow)) return 0.6;
+  if (/manager|responsable|chef|gérant|dirigeant/.test(cibleLow)) return 0.85;
+  if (/particulier|client|personne|individu/.test(cibleLow)) return 1.4;
+  return 1.0;
+}
+
+function getDureeMax() {
+  if (!currentConfig) return 900;
+  var sit = DUREES_SITUATION[currentConfig.situation];
+  if (!sit) return 900;
+  var mult = getMultiplicateurProfil(currentConfig.cible);
+  return Math.round(sit.base * mult);
+}
 
 /* ════════════════════════════════
    NAVIGATION
@@ -2670,17 +2694,73 @@ function startTimer() {
     var el = document.getElementById('timer-display');
     if (!el) return;
     el.textContent = display;
-    // Color warning after 3min, danger after 6min
-    el.className = 'timer-display' + (timerSeconds > 360 ? ' danger' : timerSeconds > 180 ? ' warning' : '');
+
+    var dureeMax = getDureeMax();
+    var pct = timerSeconds / dureeMax;
+
+    // Couleur du timer
+    el.className = 'timer-display' + (pct >= 0.9 ? ' danger' : pct >= 0.7 ? ' warning' : '');
+
+    // Phase 1 — 70% — signal d'impatience au prospect
+    if (timerSeconds === Math.round(dureeMax * 0.7)) {
+      injecterSignalTemps('impatience');
+    }
+
+    // Phase 2 — 90% — dernier avertissement
+    if (timerSeconds === Math.round(dureeMax * 0.9)) {
+      injecterSignalTemps('urgence');
+    }
+
+    // Phase 3 — 100% — fin forcée
+    if (timerSeconds >= dureeMax) {
+      stopTimer();
+      injecterSignalTemps('fin');
+    }
+
   }, 1000);
 }
-
 function stopTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   var el = document.getElementById('timer-display');
   if (el) { el.textContent = '00:00'; el.className = 'timer-display'; }
 }
+function injecterSignalTemps(phase) {
+  if (!current || !currentConfig) return;
 
+  var messages = {
+    impatience: [
+      "Bon... je vous avoue que je commence à manquer de temps.",
+      "On va devoir aller à l'essentiel, j'ai d'autres choses qui m'attendent.",
+      "Je sens qu'on tourne un peu en rond. Dites-moi concrètement ce que vous me proposez.",
+      "Je regarde l'heure... il va falloir conclure bientôt."
+    ],
+    urgence: [
+      "Je vais devoir vous arrêter dans une minute, je dois partir.",
+      "Dernière chance — dites-moi en une phrase pourquoi je devrais vous rappeler.",
+      "J'ai vraiment une réunion. Soyez bref.",
+      "On arrive à la fin de notre temps. Qu'est-ce que vous me proposez concrètement ?"
+    ],
+    fin: [
+      "Je dois raccrocher. Si vous avez quelque chose de concret, envoyez-moi un mail.",
+      "Notre temps est écoulé. Bonne journée.",
+      "Je dois y aller. Recontactez-moi avec une proposition écrite.",
+      "C'est tout le temps que j'avais. Au revoir."
+    ]
+  };
+
+  var liste = messages[phase];
+  var msg = liste[Math.floor(Math.random() * liste.length)];
+
+  addMsg(msg, 'p');
+  conversation.push({ role: 'assistant', content: msg });
+
+  if (phase === 'fin') {
+    document.getElementById('btn-send').disabled = true;
+    document.getElementById('txt').disabled = true;
+    document.getElementById('txt').placeholder = 'Simulation terminée.';
+    setTimeout(function() { triggerCallEnd('lost', msg); }, 1500);
+  }
+}
 /* ════════════════════════════════
    DIFFICULTY
 ════════════════════════════════ */
