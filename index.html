@@ -4134,6 +4134,81 @@ async function speakText(text) {
     </div>
   </div>
 </div>
-<script src="salesai_patch.js"></script>
+<script>
+(function() {
+
+  // 1. "4 scénarios progressifs" → "6 archétypes de prospects réels"
+  document.querySelectorAll('div').forEach(function(el) {
+    if (el.childNodes.length === 2 && el.textContent.trim() === '4 scénarios progressifs') {
+      el.innerHTML = '<span style="color:var(--green)">✓</span> 6 archétypes de prospects réels';
+    }
+  });
+
+  // 2. Mode Progression → grisé + badge "Bientôt"
+  var modeProgression = document.getElementById('mode-progression');
+  if (modeProgression) {
+    modeProgression.removeAttribute('onclick');
+    modeProgression.style.cursor = 'not-allowed';
+    modeProgression.style.opacity = '0.4';
+    modeProgression.style.position = 'relative';
+    var badge = document.createElement('div');
+    badge.style.cssText = 'position:absolute;top:8px;right:8px;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border:1px solid var(--muted);color:var(--muted);font-family:JetBrains Mono,monospace;pointer-events:none';
+    badge.textContent = 'Bientôt';
+    modeProgression.appendChild(badge);
+    modeProgression.addEventListener('mouseover', function() {
+      this.style.borderColor = 'var(--border2)';
+      this.style.background = 'transparent';
+    });
+    modeProgression.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border2);color:var(--ink2);padding:12px 20px;font-family:JetBrains Mono,monospace;font-size:11px;letter-spacing:1px;z-index:9999;opacity:1;transition:opacity .4s';
+      msg.textContent = 'Mode Progression disponible après 3 simulations — bientôt';
+      document.body.appendChild(msg);
+      setTimeout(function() { msg.style.opacity = '0'; }, 2500);
+      setTimeout(function() { msg.remove(); }, 3000);
+    });
+  }
+
+  // 3. Mode Manager → désactivé + badge "Bientôt"
+  var managerCard = document.querySelector('div[onclick="enterManager()"]');
+  if (managerCard) {
+    managerCard.removeAttribute('onclick');
+    managerCard.style.cursor = 'not-allowed';
+    managerCard.style.opacity = '0.5';
+    managerCard.querySelectorAll('div').forEach(function(b) {
+      if (b.textContent.trim() === 'Pro') {
+        b.textContent = 'Bientôt';
+        b.style.borderColor = 'var(--muted)';
+        b.style.color = 'var(--muted)';
+      }
+    });
+    managerCard.addEventListener('mouseover', function() {
+      this.style.background = 'var(--s2)';
+    });
+    managerCard.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--border2);color:var(--ink2);padding:12px 20px;font-family:JetBrains Mono,monospace;font-size:11px;letter-spacing:1px;z-index:9999;opacity:1;transition:opacity .4s';
+      msg.textContent = 'Mode Manager en cours de développement — bientôt disponible';
+      document.body.appendChild(msg);
+      setTimeout(function() { msg.style.opacity = '0'; }, 2500);
+      setTimeout(function() { msg.remove(); }, 3000);
+    });
+  }
+
+  // 4. Lien "commercial invité" → désactivé
+  var commercialLink = document.querySelector('span[onclick="enterCommercial()"]');
+  if (commercialLink) {
+    commercialLink.removeAttribute('onclick');
+    commercialLink.style.color = 'var(--muted)';
+    commercialLink.style.textDecoration = 'none';
+    commercialLink.style.cursor = 'not-allowed';
+    commercialLink.textContent = 'Accès équipe — bientôt disponible';
+  }
+
+})();
+</script>
+
 </body>
 </html>
