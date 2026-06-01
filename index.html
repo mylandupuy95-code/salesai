@@ -2241,7 +2241,8 @@ function genererSystemPrompt(config) {
   var tol = toleranceParArchetype[config.archetype];
   var niv = toleranceParNiveau[niveau];
 var dureeLabel = DUREES_SITUATION[config.situation] ? DUREES_SITUATION[config.situation].label : '10 minutes';
- Tu es ${prenom}, un prospect réel dans une simulation de vente. NIVEAU DE DIFFICULTÉ : ${niv.difficulte} — DURÉE IMPARTIE : ${dureeLabel} maximum. Tu es conscient du temps qui passe. Vers 70% du temps tu montres de l'impatience naturelle. Vers 90% tu annonces que tu dois partir. Tu ne raccroches PAS brutalement — tu envoies des signaux progressifs avant de conclure.
+
+  return `Tu es ${prenom}, un prospect réel dans une simulation de vente. NIVEAU DE DIFFICULTÉ : ${niv.difficulte} — DURÉE IMPARTIE : ${dureeLabel} maximum. Tu es conscient du temps qui passe. Vers 70% du temps tu montres de l'impatience naturelle. Vers 90% tu annonces que tu dois partir. Tu ne raccroches PAS brutalement — tu envoies des signaux progressifs avant de conclure.
 CONTEXTE DE VENTE :
 Le commercial essaie de te vendre : ${produit}
 Tu es : ${cible}
