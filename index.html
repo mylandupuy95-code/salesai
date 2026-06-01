@@ -2330,29 +2330,6 @@ let mood           = { interet:25, confiance:20, urgence:15 };
 const MAX_MSG = 20;
 
 // Durées en secondes par situation
-const DUREES_SITUATION = {
-  premier_contact:    { base: 240,  label: "4 minutes" },   // 4 min
-  prospect_chaud:     { base: 1200, label: "20 minutes" },  // 20 min
-  prospect_resistant: { base: 420,  label: "7 minutes" },   // 7 min
-  decision_urgente:   { base: 720,  label: "12 minutes" }   // 12 min
-};
-
-// Multiplicateurs par profil détecté
-function getMultiplicateurProfil(cible) {
-  var cibleLow = (cible || '').toLowerCase();
-  if (/patron|pdg|dg|directeur|ceo|président|président/.test(cibleLow)) return 0.6;
-  if (/manager|responsable|chef|gérant|dirigeant/.test(cibleLow)) return 0.85;
-  if (/particulier|client|personne|individu/.test(cibleLow)) return 1.4;
-  return 1.0;
-}
-
-function getDureeMax() {
-  if (!currentConfig) return 900;
-  var sit = DUREES_SITUATION[currentConfig.situation];
-  if (!sit) return 900;
-  var mult = getMultiplicateurProfil(currentConfig.cible);
-  return Math.round(sit.base * mult);
-}
 
 /* ════════════════════════════════
    NAVIGATION
