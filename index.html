@@ -4245,6 +4245,25 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
 
+  // PATCH v1.3 — Suppression des fausses barres d'humeur
+  // On garde : fiche prospect, conseils tactiques
+  // On vire : Intérêt / Confiance / Urgence
+
+  // 1. Cacher la section humeur
+  var allSideTitles = document.querySelectorAll('.side-title');
+  allSideTitles.forEach(function(t) {
+    if (t.textContent.trim() === 'Humeur estimée') {
+      t.closest('.side-section').style.display = 'none';
+    }
+  });
+
+  // 2. Neutraliser renderMood() pour qu'elle ne fasse plus rien
+  window.renderMood = function() {};
+
+})();
+</script>
 </body>
 </html>
