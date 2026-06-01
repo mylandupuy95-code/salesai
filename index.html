@@ -4209,6 +4209,42 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
+
+  // ─────────────────────────────────────────────
+  // PATCH v1.2 — Suppression des faux scores temps réel
+  // On garde : fiche prospect, humeur, conseils
+  // On vire : les 5 barres Accroche/Écoute/Argumentation/Objections/Closing
+  // ─────────────────────────────────────────────
+
+  // 1. Cacher la section "Score temps réel" dans la sidebar
+  var scoreSection = document.getElementById('score-content');
+  if (scoreSection) {
+    var parent = scoreSection.parentElement; // .side-section
+    if (parent) parent.style.display = 'none';
+  }
+
+  // 2. Neutraliser renderScores() pour qu'elle ne fasse plus rien
+  window.renderScores = function() {};
+
+  // 3. Neutraliser la mise à jour des scores dans send()
+  //    On override les variables scores pour qu'elles ne soient
+  //    plus utilisées dans l'affichage (le calcul interne reste
+  //    pour le débriefing final qui lui est honnête)
+  //    → rien à faire, renderScores() neutralisée suffit
+
+  // 4. Optionnel — remplacer le titre de section par un message clair
+  //    au cas où la section redeviendrait visible
+  var allSideTitles = document.querySelectorAll('.side-title');
+  allSideTitles.forEach(function(t) {
+    if (t.textContent.trim() === 'Score temps réel') {
+      t.closest('.side-section').style.display = 'none';
+    }
+  });
+
+})();
+</script>
 
 </body>
 </html>
