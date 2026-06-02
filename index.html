@@ -4412,5 +4412,18 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
+
+  // PATCH v1.8 — Limite 12 échanges au lieu de 20
+  MAX_MSG = 12;
+
+  // Mettre à jour l'affichage du compteur
+  var counterLabel = document.querySelector('.counter-wrap span:last-child');
+  if (counterLabel) counterLabel.textContent = '/ 12 échanges';
+
+})();
+</script>
+
 </body>
 </html>
