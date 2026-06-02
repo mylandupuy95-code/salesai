@@ -4739,5 +4739,86 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
+
+  // PATCH v2.0 — Section "Comment ça marche" sur le landing
+  // Insérée juste avant le sélecteur de mode (Individual/Manager)
+
+  var landing = document.getElementById('landing');
+  if (!landing) return;
+
+  // Trouver le conteneur principal du landing (la grille Individual/Manager)
+  var modeGrid = landing.querySelector('div[style*="grid-template-columns"]');
+  if (!modeGrid) return;
+
+  // Créer la section
+  var section = document.createElement('div');
+  section.style.cssText = 'width:100%;max-width:780px;margin-bottom:48px';
+
+  section.innerHTML = [
+
+    // Titre section
+    '<div style="text-align:center;margin-bottom:40px">',
+      '<div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:12px">// Comment ça marche</div>',
+      '<div style="font-family:Cormorant Garamond,serif;font-size:clamp(28px,4vw,42px);font-weight:600;line-height:.95;letter-spacing:-1px;color:var(--ink)">',
+        'Trois étapes.<br><em style="font-style:italic;color:var(--accent)">Un vrai entraînement.</em>',
+      '</div>',
+    '</div>',
+
+    // Étapes
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:32px">',
+
+      // Étape 1
+      '<div style="background:var(--s1);padding:32px 28px;position:relative">',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:64px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:16px;letter-spacing:-2px">01</div>',
+        '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Votre contexte</div>',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Décrivez ce que vous vendez</div>',
+        '<div style="font-size:12px;color:var(--muted);line-height:1.7">Produit, cible, situation. Plus vous êtes précis, plus le prospect sera réaliste et adapté à votre secteur.</div>',
+        '<div style="position:absolute;bottom:20px;right:20px;font-size:24px;opacity:.15">⚙</div>',
+      '</div>',
+
+      // Étape 2
+      '<div style="background:var(--s2);padding:32px 28px;position:relative;border-left:2px solid var(--accent)">',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:64px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:16px;letter-spacing:-2px">02</div>',
+        '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">La simulation</div>',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Face à un prospect IA réaliste</div>',
+        '<div style="font-size:12px;color:var(--muted);line-height:1.7">Il objecte, teste, hésite ou résiste selon son archétype. Il réagit à chaque mot que vous dites — comme un vrai humain.</div>',
+        '<div style="position:absolute;bottom:20px;right:20px;font-size:24px;opacity:.15">💬</div>',
+      '</div>',
+
+      // Étape 3
+      '<div style="background:var(--s1);padding:32px 28px;position:relative">',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:64px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:16px;letter-spacing:-2px">03</div>',
+        '<div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Le débriefing</div>',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Un expert analyse chaque échange</div>',
+        '<div style="font-size:12px;color:var(--muted);line-height:1.7">Points forts, erreurs précises, reformulations prêtes à l\'emploi. Vous savez exactement quoi changer pour la prochaine fois.</div>',
+        '<div style="position:absolute;bottom:20px;right:20px;font-size:24px;opacity:.15">📊</div>',
+      '</div>',
+
+    '</div>',
+
+    // Proof line
+    '<div style="display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap">',
+      '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)">',
+        '<span style="color:var(--green);font-size:14px">✓</span> 6 archétypes de prospects',
+      '</div>',
+      '<div style="width:1px;height:16px;background:var(--border)"></div>',
+      '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)">',
+        '<span style="color:var(--green);font-size:14px">✓</span> Débriefing expert après chaque simulation',
+      '</div>',
+      '<div style="width:1px;height:16px;background:var(--border)"></div>',
+      '<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)">',
+        '<span style="color:var(--green);font-size:14px">✓</span> 100% gratuit pour commencer',
+      '</div>',
+    '</div>',
+
+  ].join('');
+
+  // Insérer avant la grille des modes
+  modeGrid.parentNode.insertBefore(section, modeGrid);
+
+})();
+</script>
 </body>
 </html>
