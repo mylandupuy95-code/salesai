@@ -4374,5 +4374,43 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
+
+  // PATCH v1.7 — Fallback honnête pour le débriefing
+  // Au lieu d'un faux score 55 générique, on affiche un message clair
+
+  window.fallback = function() {
+    // Afficher un message honnête dans l'interface
+    document.getElementById('loader').classList.remove('on');
+
+    var resultsEl = document.getElementById('results');
+    var resWrap = resultsEl ? resultsEl.querySelector('.res-wrap') : null;
+
+    if (resWrap) {
+      resWrap.innerHTML = [
+        '<div style="text-align:center;padding:60px 0">',
+        '<div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--red);margin-bottom:20px">Analyse indisponible</div>',
+        '<div style="font-family:Cormorant Garamond,serif;font-size:48px;font-weight:600;color:var(--ink);line-height:.9;letter-spacing:-2px;margin-bottom:24px">Oups.<br><em style="color:var(--accent)">Réessayez.</em></div>',
+        '<div style="font-size:13px;color:var(--muted);line-height:1.8;max-width:400px;margin:0 auto 36px">',
+        'Le service d\'analyse est temporairement indisponible.<br>',
+        'Votre simulation était valide — relancez un débriefing.',
+        '</div>',
+        '<div style="display:flex;gap:12px;justify-content:center">',
+        '<button class="btn-primary" onclick="endSim()">Relancer l\'analyse</button>',
+        '<button class="btn-secondary" onclick="goHome()">Nouvelle simulation</button>',
+        '</div>',
+        '</div>'
+      ].join('');
+    }
+
+    show('results');
+
+    // Retourner null pour stopper le flow normal
+    return null;
+  };
+
+})();
+</script>
 </body>
 </html>
