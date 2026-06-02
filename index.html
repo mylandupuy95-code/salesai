@@ -4415,8 +4415,118 @@ async function speakText(text) {
 <script>
 (function() {
 
-  // PATCH v1.8 — Limite 12 échanges au lieu de 20
-  MAX_MSG = 12;
+ <script>
+(function() {
+
+  // PATCH v1.8 fix — MAX_MSG est une const, on override la vérification à la place
+
+  // Mettre à jour l'affichage du compteur
+  var counterLabel = document.querySelector('.counter-wrap span:last-child');
+  if (counterLabel) counterLabel.textContent = '/ 12 échanges';
+
+  // Override send() pour utiliser 12 au lieu de 20
+  var _originalSend = window.send;
+  window.send = async function() {
+    var ta  = document.getElementById('txt');
+    var txt = ta ? ta.value.trim() : '';
+    if (!txt || document.getElementById('btn-send').disabled) return;
+
+    // On laisse send() tourner normalement mais on intercepte le check msgCount
+    // en remplaçant temporairement MAX_MSG par 12 via une variable locale
+    var realMax = 12;
+
+    document.getElementById('btn-send').disabled = true;
+    ta.value = '';
+
+    addMsg(txt, 'u');
+    msgCount++;
+    updateCounter();
+
+    // Mise à jour scores
+    var txtLow = txt.toLowerCase();
+    var rand = function(amp) { return Math.round((Math.random() - 0.5) * amp); };
+    var signauxNegatifs = ['je vais voir','je vais en parler','je me permets','solution innovante','révolutionnaire','on vous accompagne','comment allez-vous','est-ce que vous avez quelques minutes','valeur ajoutée','clé en main','synergies'];
+    var aDesMotsInterdit = signauxNegatifs.some(function(s) { return txtLow.includes(s); });
+    var poseUneQuestion  = (txt.match(/\?/g) || []).length >= 1;
+    var donneUnChiffre   = /\d+/.test(txt);
+    var mentionneClient  = /concurrent|comparaison|différence|versus|par rapport/.test(txtLow);
+    var gereObjection    = /comprends|effectivement|au contraire|en revanche|c'est justement|cela dit/.test(txtLow);
+    var essaieClosing    = /rdv|rendez-vous|proposition|contrat|signer|avancer|prochaine étape|cette semaine/.test(txtLow);
+    var messageCourtVague = txt.length < 30;
+
+    function delta(positif, negatif) {
+      if (negatif) return -8 + rand(4);
+      if (positif) return 6 + rand(4);
+      return 1 + rand(3);
+    }
+
+    scores.accroche      = Math.max(5, Math.min(95, scores.accroche      + delta(poseUneQuestion && msgCount <= 3, aDesMotsInterdit || messageCourtVague)));
+    scores.ecoute        = Math.max(5, Math.min(95, scores.ecoute        + delta(poseUneQuestion, messageCourtVague)));
+    scores.argumentation = Math.max(5, Math.min(95, scores.argumentation + delta(donneUnChiffre || mentionneClient, aDesMotsInterdit)));
+    scores.objections    = Math.max(5, Math.min(95, scores.objections    + delta(gereObjection, aDesMotsInterdit)));
+    scores.closing       = Math.max(5, Math.min(95, scores.closing       + delta(essaieClosing, aDesMotsInterdit)));
+
+    var scoreMoyen = (scores.accroche + scores.ecoute + scores.argumentation + scores.objections + scores.closing) / 5;
+    var p = Math.min(msgCount / realMax, 1);
+    mood.interet   = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.9  + rand(8))));
+    mood.confiance = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.75 + rand(8))));
+    mood.urgence   = Math.max(5, Math.min(95, Math.round(scoreMoyen * 0.5  + p * 20 + rand(6))));
+
+    if (msgCount >= realMax) {
+      addSys("Limite d'échanges atteinte — génération du débriefing...");
+      setTimeout(endSim, 1200);
+      return;
+    }
+
+    showTyping();
+
+    var prodReminder = currentConfig ? " Produit : " + currentConfig.produit + "." : "";
+    var msgAvecNote = txt + "\n\n[Rappel interne - ne pas afficher : échange " + msgCount + "/" + realMax + "." + prodReminder + " " + getDiffInstruction() + " Réponds en tenant compte de TOUT ce qui a été dit avant. Fais évoluer ton état émotionnel selon la qualité de ce message. JAMAIS la même formulation deux fois. 3-4 phrases max, naturel et humain.]";
+
+    conversation.push({ role: 'user', content: msgAvecNote });
+
+    try {
+      var reply = await claude(conversation, current.systemPrompt);
+      removeTyping();
+
+      if (reply.startsWith('RACCROCHÉ:') || reply.startsWith('RACCROCHE:') || reply.includes('RACCROCHÉ') || reply.includes('RACCROCHE')) {
+        var reason = reply.replace('RACCROCHÉ:', '').replace('RACCROCHE:', '').replace('RACCROCHÉ', '').replace('RACCROCHE', '').trim();
+        addMsg(reason, 'p');
+        conversation.push({ role: 'assistant', content: reply });
+        document.getElementById('btn-send').disabled = true;
+        document.getElementById('txt').disabled = true;
+        document.getElementById('txt').placeholder = 'Simulation terminée.';
+        setTimeout(function() { triggerCallEnd('lost', reason); }, 1500);
+        return;
+      }
+
+      if (reply.startsWith('OBJECTIF ATTEINT:') || reply.includes('OBJECTIF ATTEINT')) {
+        var detail = reply.replace('OBJECTIF ATTEINT:', '').replace('OBJECTIF ATTEINT', '').trim();
+        addMsg(detail, 'p');
+        conversation.push({ role: 'assistant', content: reply });
+        document.getElementById('btn-send').disabled = true;
+        document.getElementById('txt').disabled = true;
+        document.getElementById('txt').placeholder = 'Simulation terminée.';
+        setTimeout(function() { triggerCallEnd('won', detail); }, 1500);
+        return;
+      }
+
+      addMsg(reply, 'p');
+      conversation.push({ role: 'assistant', content: reply });
+
+    } catch(e) {
+      removeTyping();
+      var errMsg = "Désolée, j'ai une urgence. Je reviens.";
+      addMsg(errMsg, 'p');
+      conversation.push({ role: 'assistant', content: errMsg });
+    }
+
+    document.getElementById('btn-send').disabled = false;
+    document.getElementById('txt').focus();
+  };
+
+})();
+</script>
 
   // Mettre à jour l'affichage du compteur
   var counterLabel = document.querySelector('.counter-wrap span:last-child');
