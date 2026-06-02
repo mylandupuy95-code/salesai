@@ -4265,6 +4265,61 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
 
+  // PATCH v1.4 — Timer naturel + fin réaliste
+  // - Timer devient simple chronomètre visuel sans déclencheurs
+  // - injecterSignalTemps() neutralisée
+  // - system prompt enrichi pour fin naturelle
+
+  // 1. Neutraliser injecterSignalTemps — plus de messages forcés
+  window.injecterSignalTemps = function() {};
+
+  // 2. Override startTimer — chronomètre visuel uniquement, zéro déclencheur
+  window.startTimer = function() {
+    timerSeconds = 0;
+    stopTimer();
+    timerInterval = setInterval(function() {
+      timerSeconds++;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      var display = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      var el = document.getElementById('timer-display');
+      if (!el) return;
+      el.textContent = display;
+      el.className = 'timer-display';
+    }, 1000);
+  };
+
+  // 3. Enrichir genererSystemPrompt avec instruction de fin naturelle
+  var _originalGenerer = window.genererSystemPrompt;
+  window.genererSystemPrompt = function(config) {
+    var prompt = _originalGenerer(config);
+
+    var instructionFin = [
+      "",
+      "GESTION NATURELLE DE LA FIN DE CONVERSATION :",
+      "Tu as une patience limitée et réelle. Si après 8 à 10 échanges le commercial n'a proposé aucune suite concrète — un RDV, une proposition chiffrée, une prochaine étape claire — tu conclus naturellement selon ton archétype :",
+      "- Pressé : 'Écoutez je dois vous laisser, si vous avez quelque chose de concret envoyez-moi un mail.'",
+      "- Méfiant : 'Je vais réfléchir de mon côté, recontactez-moi dans quelques semaines.'",
+      "- Comparateur : 'J'attends encore deux propositions, je reviendrai vers vous si ça m'intéresse.'",
+      "- Indécis : 'Je ne suis pas encore prêt à décider, donnez-moi un peu de temps.'",
+      "- Négociateur : 'Envoyez-moi une proposition écrite avec vos meilleurs tarifs.'",
+      "- Dominant : 'Je ne suis pas convaincu pour l'instant. Revenez avec des arguments plus solides.'",
+      "",
+      "Si au contraire le commercial a bien géré — bonne écoute, arguments concrets, proposition claire — tu acceptes naturellement une suite : RDV, devis, rappel. C'est le résultat d'une bonne vente.",
+      "",
+      "La fin doit toujours être cohérente avec qui tu es et avec la qualité de la conversation. Jamais mécanique, jamais brutale sans raison.",
+      "",
+      "Quand tu conclus positivement utilise exactement : OBJECTIF ATTEINT: [ce qui s'est passé]",
+      "Quand tu raccroches sans suite utilise exactement : RACCROCHÉ: [raison courte et honnête]"
+    ].join("\n");
+
+    return prompt + instructionFin;
+  };
+
+})();
+</script>
 </body>
 </html>
