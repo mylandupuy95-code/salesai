@@ -4359,6 +4359,20 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
 
+  // PATCH v1.6 — Forcer le français correct dans le system prompt
+  var _originalGenerer = window.genererSystemPrompt;
+  window.genererSystemPrompt = function(config) {
+    var prompt = _originalGenerer(config);
+
+    var instructionFrancais = "\n\nLANGUE ET ORTHOGRAPHE — RÈGLE ABSOLUE :\nTu écris exclusivement en français. Chaque réponse doit être parfaitement orthographiée, sans aucune faute de grammaire ni d'accord. Relis mentalement chaque phrase avant de l'envoyer. Les apostrophes, accents, majuscules et ponctuations doivent être corrects. C'est non négociable.";
+
+    return prompt + instructionFrancais;
+  };
+
+})();
+</script>
 </body>
 </html>
