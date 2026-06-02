@@ -4424,6 +4424,95 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+(function() {
 
+  // PATCH v1.9 — Rejouer relance exactement le même scénario
+  window.replay = function() {
+    if (!currentConfig) {
+      // Pas de config en mémoire — retour normal
+      show('home');
+      goStep1();
+      return;
+    }
+
+    // Réinitialiser l'état
+    conversation = [];
+    msgCount = 0;
+    scores = { accroche:30, ecoute:30, argumentation:30, objections:30, closing:30 };
+    mood = { interet:25, confiance:20, urgence:15 };
+
+    // Régénérer un nouveau prénom pour varier légèrement
+    currentConfig.prenom = genererPrenom(currentConfig.archetype);
+
+    // Reconstruire current depuis currentConfig
+    var arch = ARCHETYPES[currentConfig.archetype];
+    var sit  = SITUATIONS[currentConfig.situation];
+
+    current = {
+      name: sit.nom + ' — ' + arch.nom,
+      prospect: {
+        name: currentConfig.prenom,
+        role: arch.nom + ' · ' + currentConfig.cible,
+        av:   currentConfig.prenom.substring(0, 2).toUpperCase()
+      },
+      brief: [
+        { k:'Produit',     v: currentConfig.produit },
+        { k:'Cible',       v: currentConfig.cible },
+        { k:'Situation',   v: sit.nom },
+        { k:'Archétype',   v: arch.nom },
+        { k:'Déclencheur', v: arch.declencheurPositif }
+      ],
+      tips: [
+        'Faiblesse du prospect : ' + arch.faiblesseCommercial,
+        'Ce qui l\'engage : ' + arch.declencheurPositif,
+        sit.contexte
+      ],
+      objective:    sit.contexte,
+      context:      sit.contexte,
+      killwords:    [arch.faiblesseCommercial],
+      systemPrompt: genererSystemPrompt(currentConfig)
+    };
+
+    currentKey = currentConfig.archetype;
+
+    // Header simulation
+    document.getElementById('sim-title').textContent = current.name;
+    document.getElementById('sim-av').textContent    = current.prospect.av;
+    document.getElementById('sim-name').textContent  = current.prospect.name;
+    document.getElementById('sim-role').textContent  = current.prospect.role;
+
+    // Chat vide
+    document.getElementById('chat-log').innerHTML = '';
+
+    // Sidebar
+    renderBrief();
+    renderTips();
+    updateCounter();
+
+    // Réactiver input
+    var txtEl = document.getElementById('txt');
+    var btnEl = document.getElementById('btn-send');
+    if (txtEl) {
+      txtEl.disabled = false;
+      txtEl.value = '';
+      txtEl.placeholder = 'Répondez naturellement...';
+      txtEl.style.opacity = '1';
+      txtEl.removeAttribute('disabled');
+    }
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.style.opacity = '1';
+      btnEl.removeAttribute('disabled');
+    }
+
+    show('sim');
+    startTimer();
+    addSys('Nouvelle tentative — ' + current.name);
+    prospectFirst();
+  };
+
+})();
+</script>
 </body>
 </html>
