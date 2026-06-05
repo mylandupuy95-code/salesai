@@ -4813,5 +4813,18 @@ async function speakText(text) {
 
 })();
 </script>
+<script>
+async function envoyerABrevo(prenom, email) {
+  try {
+    await fetch('https://delicate-sun-5cc0.mylan-dupuy95.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'brevo', email: email, prenom: prenom })
+    });
+  } catch(e) {
+    console.log('Brevo error:', e);
+  }
+}
+</script>
 </body>
 </html>
