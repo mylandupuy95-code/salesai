@@ -1265,8 +1265,9 @@ function lancerSimulation() {
   };
 
   // Reset état
-  conversation = [];
-  msgCount     = 0;
+  conversation      = [];
+  msgCount          = 0;
+  weakResponseCount = 0;
 
   // UI
   document.getElementById('sim-title').textContent = current.name;
@@ -1427,6 +1428,54 @@ async function prospectFirst() {
 }
 
 /* ═══════════════════════════════════════════════
+   DÉTECTION QUALITÉ MESSAGE
+═══════════════════════════════════════════════ */
+let weakResponseCount = 0; // compteur global de réponses faibles
+
+function evaluerQualiteMessage(txt) {
+  const t = txt.toLowerCase().trim();
+
+  // Réponses clairement vides — un seul mot ou expression sans substance
+  const reponsesVides = [
+    'ok','okay','oui','non','bien','parfait','absolument','exactement',
+    'bien sûr','bien sur','d\'accord','dacord','compris','entendu',
+    'je vois','je comprends','pas de problème','pas de probleme',
+    'super','génial','genial','merci','pardon','désolé','desole',
+    'effectivement','tout à fait','tout a fait','voilà','voila',
+    'c\'est ça','c\'est ca','exact'
+  ];
+
+  // Message = exactement une de ces réponses (avec ponctuation possible)
+  const txtClean = t.replace(/[.!?,]/g, '').trim();
+  if (reponsesVides.includes(txtClean)) return 'vide';
+
+  // Message très court SANS question ni chiffre ni argument
+  const aQuestion   = txt.includes('?');
+  const aChiffre    = /\d/.test(txt);
+  const aArgument   = txt.length > 40;
+  const aProposition = /rdv|rendez-vous|proposition|rappel|semaine|lundi|mardi|mercredi|jeudi|vendredi|démo|demo|essai|gratuit|offre/.test(t);
+
+  if (txt.length < 25 && !aQuestion && !aChiffre && !aArgument && !aProposition) return 'faible';
+
+  // Message avec substance
+  return 'bon';
+}
+
+function getBilanQualite() {
+  const seuils = {
+    debutant:      3,
+    intermediaire: 2,
+    expert:        2
+  };
+  const seuil = seuils[currentConfig.niveau] || 2;
+  const restant = seuil - weakResponseCount;
+
+  if (weakResponseCount === 0) return 'Aucune réponse faible pour l\'instant.';
+  if (restant > 0) return `ATTENTION : ${weakResponseCount} réponse(s) faible(s) ou vide(s) déjà comptabilisée(s). Il t'en faut ${restant} de plus pour raccrocher selon ton seuil de tolérance.`;
+  return `SEUIL ATTEINT : ${weakResponseCount} réponses faibles/vides consécutives. Tu DOIS raccrocher maintenant sauf si le dernier message était vraiment bon.`;
+}
+
+/* ═══════════════════════════════════════════════
    ENVOI MESSAGE
 ═══════════════════════════════════════════════ */
 function onKey(e) {
@@ -1445,6 +1494,15 @@ async function send() {
   msgCount++;
   updateCounter();
 
+  // Évaluer la qualité du message et mettre à jour le compteur
+  const qualite = evaluerQualiteMessage(txt);
+  if (qualite === 'vide' || qualite === 'faible') {
+    weakResponseCount++;
+  } else {
+    // Un bon message réinitialise partiellement le compteur
+    weakResponseCount = Math.max(0, weakResponseCount - 1);
+  }
+
   if (msgCount >= MAX_EXCHANGES) {
     addSys('Limite d\'échanges atteinte — génération du débriefing...');
     setTimeout(endSim, 1200);
@@ -1453,7 +1511,17 @@ async function send() {
 
   showTyping();
 
-  const msgAvecNote = txt + `\n\n[Rappel interne - ne pas afficher : échange ${msgCount}/${MAX_EXCHANGES}. Produit : ${currentConfig.produit}. Réponds en tenant compte de TOUT ce qui a été dit. Fais évoluer ton état selon la qualité de ce message. JAMAIS la même structure. 3-4 phrases max.]`;
+  const bilan = getBilanQualite();
+  const qualiteLabel = qualite === 'vide' ? 'VIDE — aucune substance' : qualite === 'faible' ? 'FAIBLE — peu d\'argument' : 'CORRECT — contient de la substance';
+
+  const msgAvecNote = txt + `\n\n[Rappel interne - ne pas afficher :
+- Échange : ${msgCount}/${MAX_EXCHANGES}
+- Qualité de CE message : ${qualiteLabel}
+- Bilan global : ${bilan}
+- Produit vendu : ${currentConfig.produit}
+- Niveau commercial : ${currentConfig.niveau.toUpperCase()}
+ACTION REQUISE : Réagis en fonction du bilan global, pas seulement de ce message. Si le seuil est atteint, RACCROCHÉ: maintenant. Sinon, fais évoluer ton ton selon l'historique. JAMAIS la même structure. 3-4 phrases max.]`;
+
   conversation.push({ role:'user', content: msgAvecNote });
 
   try {
@@ -1812,7 +1880,7 @@ function replayScenario() {
     tips: ['Faiblesse : ' + arch.faiblesseCommercial, 'Déclencheur : ' + arch.declencheurPositif, sit.contexte],
     systemPrompt: genererSystemPrompt(currentConfig)
   };
-  conversation = []; msgCount = 0;
+  conversation = []; msgCount = 0; weakResponseCount = 0;
   document.getElementById('sim-title').textContent = current.name;
   document.getElementById('sim-av').textContent    = current.prospect.av;
   document.getElementById('sim-name').textContent  = current.prospect.name;
