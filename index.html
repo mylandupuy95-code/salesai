@@ -1509,18 +1509,58 @@ async function send() {
     return;
   }
 
+  // Seuils de raccrochage par niveau — décision JS, pas LLM
+  const seuilsRaccrochage = { debutant: 3, intermediaire: 2, expert: 2 };
+  const seuil = seuilsRaccrochage[currentConfig.niveau] || 2;
+
+  // Réponses de raccrochage par archétype — naturelles et dans le personnage
+  const raccrochagesParArchetype = {
+    presse: [
+      "Je n'ai vraiment pas de temps pour ça. Rappelez-moi quand vous aurez quelque chose de concret.",
+      "Écoutez, j'ai une réunion. Si vous n'avez rien à dire, ne m'appelez plus.",
+      "Je raccroche. Envoyez-moi un mail si vous avez une vraie proposition."
+    ],
+    mefiant: [
+      "Je ne comprends pas ce que vous voulez me vendre. Je vais réfléchir de mon côté.",
+      "Vous ne me donnez rien de sérieux. Je ne vois pas l'intérêt de continuer.",
+      "On tourne en rond. Recontactez-moi quand vous aurez des preuves concrètes."
+    ],
+    comparateur: [
+      "Vos concurrents m'ont donné des chiffres précis. Vous, rien. Je vais vers eux.",
+      "Sans argument différenciant, je n'ai aucune raison de choisir votre solution.",
+      "J'ai des offres bien plus documentées sur la table. Au revoir."
+    ],
+    indecis: [
+      "Je... je ne me sens pas à l'aise pour continuer. Je vais réfléchir et je vous rappelle peut-être.",
+      "Vous ne m'avez pas donné assez d'éléments pour avancer. Je vais prendre le temps de réfléchir.",
+      "Je préfère en rester là pour l'instant. Envoyez-moi quelque chose par écrit si vous voulez."
+    ],
+    negociateur: [
+      "Sans argument solide, je ne vois pas pourquoi je vous donnerais mon temps. Bonne journée.",
+      "Vous n'avez rien à négocier. Je passe à autre chose.",
+      "J'attendais une proposition concrète. Je ne l'ai pas eue. Au revoir."
+    ],
+    dominant: [
+      "C'est tout ce que vous avez ? Je ne perds plus mon temps avec ça.",
+      "Vous n'êtes pas au niveau. Je raccroche.",
+      "Je m'attendais à mieux. Beaucoup mieux. Bonne journée."
+    ]
+  };
+
+  if (weakResponseCount >= seuil) {
+    // Raccrochage forcé par le JS — on n'appelle pas le LLM
+    const liste = raccrochagesParArchetype[currentConfig.archetype] || raccrochagesParArchetype.dominant;
+    const raison = liste[Math.floor(Math.random() * liste.length)];
+    addMsg(raison, 'p');
+    disableInput();
+    setTimeout(() => triggerCallEnd('lost', raison), 1500);
+    return;
+  }
+
   showTyping();
 
-  const bilan = getBilanQualite();
   const qualiteLabel = qualite === 'vide' ? 'VIDE — aucune substance' : qualite === 'faible' ? 'FAIBLE — peu d\'argument' : 'CORRECT — contient de la substance';
-
-  const msgAvecNote = txt + `\n\n[Rappel interne - ne pas afficher :
-- Échange : ${msgCount}/${MAX_EXCHANGES}
-- Qualité de CE message : ${qualiteLabel}
-- Bilan global : ${bilan}
-- Produit vendu : ${currentConfig.produit}
-- Niveau commercial : ${currentConfig.niveau.toUpperCase()}
-ACTION REQUISE : Réagis en fonction du bilan global, pas seulement de ce message. Si le seuil est atteint, RACCROCHÉ: maintenant. Sinon, fais évoluer ton ton selon l'historique. JAMAIS la même structure. 3-4 phrases max.]`;
+  const msgAvecNote = txt + `\n\n[Rappel interne - ne pas afficher : échange ${msgCount}/${MAX_EXCHANGES}. Qualité : ${qualiteLabel}. Réponses faibles cumulées : ${weakResponseCount}/${seuil}. Fais évoluer ton ton. JAMAIS la même structure. 3-4 phrases max.]`;
 
   conversation.push({ role:'user', content: msgAvecNote });
 
