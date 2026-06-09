@@ -578,88 +578,215 @@ textarea::placeholder { color:var(--muted); }
 </div>
 
 <!-- ════════ LANDING ════════ -->
-<div id="landing">
-  <nav>
-    <div class="logo-wrap">
-      <div class="logo-icon">S</div>
-      <span class="logo-text">SalesAI</span>
+<div id="landing" style="background:#ffffff;min-height:100vh;display:flex;flex-direction:column;font-family:'Inter','Helvetica Neue',sans-serif">
+
+  <!-- Nav -->
+  <nav style="background:#fff;border-bottom:1px solid #e5e7eb;padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;background:#111827;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff">S</div>
+      <span style="font-size:16px;font-weight:700;color:#111827;letter-spacing:-0.3px">SalesAI</span>
     </div>
-    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);border:1px solid var(--border2);padding:5px 14px">Choisir votre espace</div>
+    <div style="display:flex;align-items:center;gap:24px">
+      <span style="font-size:14px;color:#6b7280;cursor:pointer" onclick="document.getElementById('landing-how').scrollIntoView({behavior:'smooth'})">Comment ça marche</span>
+      <span style="font-size:14px;color:#6b7280;cursor:pointer" onclick="document.getElementById('landing-archetypes').scrollIntoView({behavior:'smooth'})">Profils</span>
+      <button onclick="enterIndividual()" style="background:#111827;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#374151'" onmouseout="this.style.background='#111827'">Essai gratuit →</button>
+    </div>
   </nav>
 
-  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 48px">
-    <div style="width:100%;max-width:780px">
-      <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:20px;text-align:center">Simulateur d'entraînement commercial IA</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(40px,6vw,72px);font-weight:600;line-height:.9;letter-spacing:-2px;color:var(--ink);margin-bottom:16px;text-align:center">Qui êtes-<br><em style="font-style:italic;color:var(--accent)">vous ?</em></div>
-      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:48px;line-height:1.7">Choisissez votre espace pour accéder à l'expérience adaptée à votre rôle.</div>
-
-      <!-- Comment ça marche -->
-      <div style="margin-bottom:48px">
-        <div style="text-align:center;margin-bottom:32px">
-          <div style="font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);margin-bottom:12px">// Comment ça marche</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3vw,36px);font-weight:600;line-height:.95;letter-spacing:-1px;color:var(--ink)">Trois étapes.<br><em style="font-style:italic;color:var(--accent)">Un vrai entraînement.</em></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:28px">
-          <div style="background:var(--s1);padding:28px;position:relative">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:12px;letter-spacing:-2px">01</div>
-            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Votre contexte</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.1">Décrivez ce que vous vendez</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.7">Produit, cible, niveau. Plus vous êtes précis, plus le prospect sera réaliste.</div>
-          </div>
-          <div style="background:var(--s2);padding:28px;position:relative;border-left:2px solid var(--accent)">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:12px;letter-spacing:-2px">02</div>
-            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">La simulation</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.1">Face à un prospect IA réaliste</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.7">Il objecte, teste, hésite ou résiste selon son archétype. Il réagit à chaque mot.</div>
-          </div>
-          <div style="background:var(--s1);padding:28px;position:relative">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--border2);line-height:1;margin-bottom:12px;letter-spacing:-2px">03</div>
-            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Le débriefing</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--ink);margin-bottom:10px;line-height:1.1">Un expert analyse chaque échange</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.7">Points forts, erreurs précises, reformulations prêtes à l'emploi.</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)"><span style="color:var(--green)">✓</span> 6 archétypes de prospects réels</div>
-          <div style="width:1px;height:14px;background:var(--border)"></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)"><span style="color:var(--green)">✓</span> Débriefing expert après chaque simulation</div>
-          <div style="width:1px;height:14px;background:var(--border)"></div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)"><span style="color:var(--green)">✓</span> 100% gratuit pour commencer</div>
-        </div>
+  <!-- Hero -->
+  <section style="padding:80px 48px 72px;max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;margin-bottom:24px;border:1px solid #bbf7d0">
+        <span style="width:6px;height:6px;background:#16a34a;border-radius:50%;display:inline-block"></span>
+        100% gratuit pour commencer
       </div>
-
-      <!-- Mode cards -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--border);border:1px solid var(--border)">
-        <div onclick="enterIndividual()" style="background:var(--s1);padding:40px;cursor:pointer;position:relative;transition:background .2s" onmouseover="this.style.background='var(--s2)'" onmouseout="this.style.background='var(--s1)'">
-          <div style="position:absolute;top:20px;right:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--green);color:var(--green)">Gratuit</div>
-          <div style="font-size:36px;margin-bottom:20px">⚡</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Mode<br>Individuel</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px">Entraînez-vous seul face à des prospects IA ultra-réalistes.</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> 6 archétypes de prospects réels</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Débriefing expert</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Historique et progression</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--green)">✓</span> Replay du bon choix</div>
-          </div>
-          <div style="background:var(--accent);color:#000;padding:14px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase">Accéder →</div>
+      <h1 style="font-size:clamp(32px,4vw,52px);font-weight:800;color:#111827;line-height:1.05;letter-spacing:-1.5px;margin-bottom:20px">
+        Simulez les appels<br>que vous redoutez.<br><span style="color:#2563eb">Avant de les rater.</span>
+      </h1>
+      <p style="font-size:17px;color:#6b7280;line-height:1.7;margin-bottom:32px;max-width:440px">
+        Simulez de vrais appels de vente. Échouez sans conséquences. Progressez vite.
+      </p>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button onclick="enterIndividual()" style="background:#2563eb;color:#fff;border:none;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+          Commencer gratuitement →
+        </button>
+        <span style="font-size:13px;color:#9ca3af">Aucune carte requise</span>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:36px;padding-top:28px;border-top:1px solid #f3f4f6">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#111827">6</div>
+          <div style="font-size:12px;color:#9ca3af">profils de prospects</div>
         </div>
-        <div style="background:var(--s2);padding:40px;position:relative;border-left:3px solid var(--border2);opacity:.5;cursor:not-allowed">
-          <div style="position:absolute;top:20px;right:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--muted);color:var(--muted)">Bientôt</div>
-          <div style="font-size:36px;margin-bottom:20px">👥</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.1">Mode<br>Manager</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:24px">Créez des scénarios sur mesure, invitez vos commerciaux et suivez leur progression.</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--muted)">✓</span> Tableau de bord équipe</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--muted)">✓</span> Scénarios personnalisés</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--muted)">✓</span> Invitation des commerciaux</div>
-            <div style="display:flex;gap:10px;font-size:11px;color:var(--ink2)"><span style="color:var(--muted)">✓</span> Scores en temps réel</div>
-          </div>
-          <div style="background:var(--border2);color:var(--muted);padding:14px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase">Disponible prochainement</div>
+        <div style="width:1px;background:#f3f4f6"></div>
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#111827">4</div>
+          <div style="font-size:12px;color:#9ca3af">types de situations</div>
+        </div>
+        <div style="width:1px;background:#f3f4f6"></div>
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#111827">100%</div>
+          <div style="font-size:12px;color:#9ca3af">adapté à votre produit</div>
         </div>
       </div>
     </div>
+
+    <!-- Aperçu simulation -->
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:16px;padding:24px;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1d4ed8">N</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#111827">Nicolas — Le Pressé</div>
+            <div style="font-size:11px;color:#9ca3af">Directeur Commercial · SaaS RH</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#16a34a;font-weight:600">
+          <span style="width:6px;height:6px;background:#16a34a;border-radius:50%;display:inline-block"></span>
+          En cours
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;border-left:3px solid #6b7280;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6">
+          Vous avez 2 minutes. Qu'est-ce que vous vendez exactement ?
+        </div>
+        <div style="background:#eff6ff;border-radius:10px;border-right:3px solid #2563eb;padding:12px 14px;font-size:13px;color:#1e40af;line-height:1.6;text-align:right">
+          On aide vos commerciaux à s'entraîner sur des appels difficiles avant de les passer pour de vrai.
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;border-left:3px solid #6b7280;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6">
+          Concrètement, ça donne quoi comme résultats ?
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 0">
+          <div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:dot1 1.2s infinite"></div>
+          <div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:dot1 1.2s .2s infinite"></div>
+          <div style="width:6px;height:6px;background:#9ca3af;border-radius:50%;animation:dot1 1.2s .4s infinite"></div>
+          <span style="font-size:11px;color:#9ca3af;margin-left:4px">Nicolas répond...</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;display:flex;gap:8px">
+        <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px;font-size:12px;color:#9ca3af">Votre réponse...</div>
+        <button onclick="enterIndividual()" style="background:#2563eb;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Envoyer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bande sociale proof -->
+  <div style="background:#f9fafb;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;padding:20px 48px">
+    <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap">
+      <div style="font-size:13px;color:#6b7280;display:flex;align-items:center;gap:8px"><span style="color:#16a34a;font-weight:700">✓</span> Aucune installation</div>
+      <div style="font-size:13px;color:#6b7280;display:flex;align-items:center;gap:8px"><span style="color:#16a34a;font-weight:700">✓</span> Adapté à votre secteur</div>
+      <div style="font-size:13px;color:#6b7280;display:flex;align-items:center;gap:8px"><span style="color:#16a34a;font-weight:700">✓</span> Débriefing expert après chaque session</div>
+      <div style="font-size:13px;color:#6b7280;display:flex;align-items:center;gap:8px"><span style="color:#16a34a;font-weight:700">✓</span> Historique de progression</div>
+    </div>
   </div>
+
+  <!-- Comment ça marche -->
+  <section id="landing-how" style="padding:80px 48px;max-width:1100px;margin:0 auto;width:100%">
+    <div style="text-align:center;margin-bottom:52px">
+      <div style="font-size:12px;font-weight:700;color:#2563eb;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Comment ça marche</div>
+      <h2 style="font-size:clamp(28px,3vw,40px);font-weight:800;color:#111827;letter-spacing:-1px;line-height:1.1;margin-bottom:14px">Trois étapes. Un vrai entraînement.</h2>
+      <p style="font-size:16px;color:#6b7280;max-width:520px;margin:0 auto;line-height:1.7">Pas de théorie. Pas de vidéos. Vous parlez, le prospect réagit, vous progressez.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:32px;position:relative;overflow:hidden">
+        <div style="width:40px;height:40px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+          <span style="font-size:18px">🎯</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#2563eb;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Étape 01</div>
+        <h3 style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px;letter-spacing:-0.3px">Décrivez votre contexte</h3>
+        <p style="font-size:14px;color:#6b7280;line-height:1.7">Ce que vous vendez, à qui, votre niveau. Plus vous êtes précis, plus le prospect sera réaliste et adapté à votre secteur exact.</p>
+        <div style="position:absolute;bottom:-10px;right:-10px;font-size:80px;opacity:.04;font-weight:800;color:#111827">01</div>
+      </div>
+      <div style="background:#fff;border:2px solid #2563eb;border-radius:16px;padding:32px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:16px;right:16px;background:#eff6ff;color:#2563eb;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">Le cœur du produit</div>
+        <div style="width:40px;height:40px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+          <span style="font-size:18px">💬</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#2563eb;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Étape 02</div>
+        <h3 style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px;letter-spacing:-0.3px">Simulez l'appel</h3>
+        <p style="font-size:14px;color:#6b7280;line-height:1.7">Le prospect réagit à chaque mot. Il objecte, teste votre résistance, raccroche si vous tournez en rond. Exactement comme dans la vraie vie.</p>
+        <div style="position:absolute;bottom:-10px;right:-10px;font-size:80px;opacity:.04;font-weight:800;color:#2563eb">02</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:32px;position:relative;overflow:hidden">
+        <div style="width:40px;height:40px;background:#f0fdf4;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+          <span style="font-size:18px">📊</span>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#16a34a;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Étape 03</div>
+        <h3 style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px;letter-spacing:-0.3px">Recevez le débriefing</h3>
+        <p style="font-size:14px;color:#6b7280;line-height:1.7">Points forts, erreurs précises, reformulations prêtes à l'emploi. Vous savez exactement quoi changer pour la prochaine fois.</p>
+        <div style="position:absolute;bottom:-10px;right:-10px;font-size:80px;opacity:.04;font-weight:800;color:#111827">03</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Archétypes -->
+  <section id="landing-archetypes" style="padding:80px 48px;background:#f9fafb;border-top:1px solid #e5e7eb">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:52px">
+        <div style="font-size:12px;font-weight:700;color:#2563eb;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Les profils</div>
+        <h2 style="font-size:clamp(28px,3vw,40px);font-weight:800;color:#111827;letter-spacing:-1px;line-height:1.1;margin-bottom:14px">6 types de prospects. Les vrais.</h2>
+        <p style="font-size:16px;color:#6b7280;max-width:520px;margin:0 auto;line-height:1.7">Chaque archétype a ses propres réflexes, objections et signaux d'achat. Entraînez-vous sur tous.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">🛡</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">Le Méfiant</div><div style="font-size:13px;color:#6b7280;line-height:1.6">A été déçu avant. Teste chaque promesse. Exige des preuves concrètes.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">⚡</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">Le Pressé</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Débordé. Coupe si vous perdez son temps. Vous avez 30 secondes.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">⚖</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">Le Comparateur</div><div style="font-size:13px;color:#6b7280;line-height:1.6">A vu vos concurrents. Compare tout. Veut la meilleure offre objective.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">🌀</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">L'Indécis</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Intéressé mais a peur de se tromper. Hésite. A besoin d'être rassuré.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">🎯</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">Le Négociateur</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Veut toujours un effort. Pousse sur le prix. Teste vos limites.</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+          <div style="font-size:28px;flex-shrink:0">👑</div>
+          <div><div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px">Le Dominant</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Teste votre légitimité. Condescendant. Respecte seulement les experts.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final -->
+  <section style="padding:80px 48px;text-align:center;background:#fff;border-top:1px solid #e5e7eb">
+    <div style="max-width:600px;margin:0 auto">
+      <h2 style="font-size:clamp(28px,3vw,40px);font-weight:800;color:#111827;letter-spacing:-1px;line-height:1.1;margin-bottom:16px">Prêt à vous entraîner ?</h2>
+      <p style="font-size:16px;color:#6b7280;margin-bottom:32px;line-height:1.7">Lancez votre première simulation en moins de 2 minutes. Gratuit, sans inscription.</p>
+      <button onclick="enterIndividual()" style="background:#2563eb;color:#fff;border:none;padding:16px 36px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+        Commencer gratuitement →
+      </button>
+      <div style="margin-top:20px;font-size:13px;color:#9ca3af">Aucune carte bancaire · Aucune installation</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:24px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:22px;height:22px;background:#111827;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">S</div>
+      <span style="font-size:13px;font-weight:600;color:#374151">SalesAI</span>
+    </div>
+    <div style="font-size:12px;color:#9ca3af">Simulateur de vente B2B · 2025</div>
+  </footer>
 </div>
+
+<style>
+@keyframes dot1 { 0%,80%,100%{transform:scale(.5);opacity:.3} 40%{transform:scale(1);opacity:1} }
+#landing * { box-sizing: border-box; }
+@media(max-width:768px) {
+  #landing section { padding: 48px 20px !important; }
+  #landing nav { padding: 0 20px !important; }
+  #landing section > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+  #landing footer { padding: 20px !important; }
+}
+</style>
 
 <!-- ════════ HOME (onboarding) ════════ -->
 <div id="home">
