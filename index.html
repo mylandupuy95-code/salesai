@@ -771,6 +771,7 @@ Analyse UNIQUEMENT les messages COMMERCIAL. Réponds UNIQUEMENT en JSON valide s
 }
 
 function renderResults(d){
+  show('results');
   const score=d.score_global,cls=score>=75?'s-top':score>=50?'s-mid':'s-low';
   document.getElementById('res-title').innerHTML=score>=75?'Excellent<br><em>travail.</em>':score>=50?'Bon début,<br><em>à affiner.</em>':'À retravailler<br><em>sérieusement.</em>';
   const rClass={'DEAL SIGNÉ':'win','RDV OBTENU':'win','EN COURS':'partial','À RELANCER':'partial','DEAL PERDU':'loss'}[d.resultat]||'partial';
@@ -786,7 +787,6 @@ function renderResults(d){
   document.getElementById('res-detail').innerHTML=html;
   document.getElementById('email-sent').classList.remove('visible');
   document.getElementById('email-prenom').value='';document.getElementById('email-addr').value='';
-  show('results')
 }
 
 function openReplayModal(e,s,i){replayFromIndex=i;document.getElementById('replay-context-msg').textContent=e;document.getElementById('replay-suggestion').textContent=s;document.getElementById('replay-textarea').value=s;document.getElementById('replay-modal').classList.add('visible');setTimeout(()=>{const ta=document.getElementById('replay-textarea');ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},100)}
