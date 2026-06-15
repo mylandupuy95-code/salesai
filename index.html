@@ -781,11 +781,13 @@ function renderResults(d){
   let html=`<div class="rd-title">Débriefing expert</div><div class="rd-cols"><div><div class="rd-col-title g">✓ Ce qui a bien marché</div><div class="rd-list">${d.points_forts.map(p=>`<div class="rd-item"><span style="color:var(--green);margin-right:4px">+</span><span>${p}</span></div>`).join('')}</div></div><div><div class="rd-col-title r">✗ Erreurs à corriger</div><div class="rd-list">${d.erreurs.map(p=>`<div class="rd-item"><span style="color:var(--red);margin-right:4px">−</span><span>${p}</span></div>`).join('')}</div></div></div><div class="prospect-voice"><div class="pv-label">Ce que ${current.prospect.name} aurait pensé</div><div class="pv-text">"${d.pensee_prospect}"</div></div><div class="conseil-box"><div class="conseil-label">Conseil prioritaire</div><div class="conseil-text">${d.conseil}</div></div>`;
   if(d.vs_humain)html+=`<div class="human-section" style="margin-top:20px"><div class="human-title">Face à un vrai humain — ce qui serait différent</div><div class="human-intro">${d.vs_humain.intro}</div><div class="human-diff">${d.vs_humain.differences.map(x=>`<div class="hd-item"><span style="margin-right:8px">⚠</span><span>${x}</span></div>`).join('')}</div></div>`;
   const refs=(d.reformulations||[]).filter(r=>r&&r.dit&&r.dit!=='null'&&r.aurait_du);
+  window._replayData=[];
   if(refs.length>0){html+=`<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="rd-title">Ce que vous auriez pu dire</div>${refs.map((r,idx)=>{
     const cc=conversation.filter(m=>!m.content.startsWith('DEBUT_SIMULATION'));
-    let ci=cc.length; // par défaut à la fin
+    let ci=cc.length;
     for(let i=0;i<cc.length;i++){if(cc[i].role==='user'&&cc[i].content.includes(r.dit.substring(0,15))){ci=i;break}}
-    return`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px">Vous avez dit</div><div style="font-size:13px;color:var(--ink2);font-style:italic;margin-bottom:10px;padding:10px 14px;background:var(--red-soft);border-left:2px solid var(--red);border-radius:0 var(--r) var(--r) 0">"${r.dit}"</div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:5px">À la place</div><div style="font-size:13px;color:var(--ink);padding:10px 14px;background:var(--green-soft);border-left:2px solid var(--green);border-radius:0 var(--r) var(--r) 0">"${r.aurait_du}"</div><button class="replay-btn" onclick="openReplayModal(${JSON.stringify(r.dit)},${JSON.stringify(r.aurait_du)},${ci})">↺ Rejouer ce moment</button></div>`}).join('')}</div>`}
+    window._replayData[idx]={dit:r.dit,aurait_du:r.aurait_du,ci:ci};
+    return`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px">Vous avez dit</div><div style="font-size:13px;color:var(--ink2);font-style:italic;margin-bottom:10px;padding:10px 14px;background:var(--red-soft);border-left:2px solid var(--red);border-radius:0 var(--r) var(--r) 0">"${r.dit}"</div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:5px">A la place</div><div style="font-size:13px;color:var(--ink);padding:10px 14px;background:var(--green-soft);border-left:2px solid var(--green);border-radius:0 var(--r) var(--r) 0">"${r.aurait_du}"</div><button class="replay-btn" onclick="openReplayByIndex(${idx})">&#8635; Rejouer ce moment</button></div>`}).join('')}</div>`}
   const ct=conversation.filter(m=>!m.content.startsWith('DEBUT_SIMULATION')).map(m=>({role:m.role,text:m.content.split('[Interne:')[0].trim()})).filter(m=>m.text.length>0);
   if(ct.length>0){html+=`<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="rd-title">Replay de la conversation</div>${ct.map(m=>{const iu=m.role==='user',name=iu?'Vous':current.prospect.name,bg=iu?'var(--accent-soft)':'var(--s1)',bc=iu?'var(--accent)':'var(--border2)',nc=iu?'var(--accent)':'var(--muted)';return`<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${nc};margin-bottom:3px">${name}</div><div style="font-size:13px;line-height:1.7;color:var(--ink2);padding:10px 14px;background:${bg};border-left:2px solid ${bc};border-radius:0 var(--r) var(--r) 0">${m.text}</div></div>`}).join('')}</div>`}
   document.getElementById('res-detail').innerHTML=html;
@@ -793,7 +795,13 @@ function renderResults(d){
   document.getElementById('email-prenom').value='';document.getElementById('email-addr').value='';
 }
 
+function openReplayByIndex(idx){
+  const data=window._replayData&&window._replayData[idx];
+  if(!data)return;
+  openReplayModal(data.dit,data.aurait_du,data.ci);
+}
 function openReplayModal(e,s,i){replayFromIndex=i;document.getElementById('replay-context-msg').textContent=e;document.getElementById('replay-suggestion').textContent=s;document.getElementById('replay-textarea').value=s;document.getElementById('replay-modal').classList.add('visible');setTimeout(()=>{const ta=document.getElementById('replay-textarea');ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},100)}
+function openReplayByIndex(idx){const d=window._replayData&&window._replayData[idx];if(!d)return;openReplayModal(d.dit,d.aurait_du,d.ci)}
 function closeReplayModal(){document.getElementById('replay-modal').classList.remove('visible')}
 async function submitReplay(){
   const ut=(document.getElementById('replay-textarea').value||'').trim();
