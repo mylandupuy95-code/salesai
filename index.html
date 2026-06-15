@@ -522,11 +522,12 @@ textarea::placeholder{color:var(--faint)}
         <div class="mode-grid">
           <div class="mode-card" id="mode-cible" onclick="selectMode('cible')"><div class="micon">🎯</div><div class="mname">Ciblé</div><div class="mdesc">Je choisis le profil</div></div>
           <div class="mode-card" id="mode-aleatoire" onclick="selectMode('aleatoire')"><div class="micon">🎲</div><div class="mname">Aléatoire</div><div class="mdesc">Surprise totale</div></div>
-          <div class="mode-card disabled"><div class="soon-badge">Bientôt</div><div class="micon">📈</div><div class="mname">Progression</div><div class="mdesc">Selon mes faiblesses</div></div>
+          <div class="mode-card" id="mode-progression" onclick="selectMode('progression')"><div class="micon">📈</div><div class="mname">Progression</div><div class="mdesc">Selon mes faiblesses</div></div>
         </div>
       </div>
       <div id="archetypes-grid" class="arch-list" style="display:none"></div>
       <div class="info-box" id="info-aleatoire"><p>Le prospect sera généré aléatoirement. Vous ne saurez pas à qui vous avez affaire avant de commencer — exactement comme dans la vraie vie.</p></div>
+      <div class="info-box" id="info-progression" style="display:none;border-left-color:var(--green)"><div id="progression-analyse"></div></div>
       <div class="btn-row">
         <button class="btn-secondary" onclick="goStep1()">← Retour</button>
         <button class="btn-primary full" onclick="lancerSimulation()">Lancer la simulation →</button>
@@ -676,7 +677,120 @@ function goStep2(){
 }
 function selectNiveau(niv){selectedNiveau=niv;['debutant','intermediaire','expert'].forEach(n=>document.getElementById('niv-'+n).classList.toggle('selected',n===niv))}
 function selectSituation(key){selectedSituation=key;Object.keys(SITUATIONS).forEach(k=>document.getElementById('sit-'+k).classList.toggle('selected',k===key))}
-function selectMode(mode){selectedMode=mode;['cible','aleatoire'].forEach(m=>document.getElementById('mode-'+m).classList.toggle('selected',m===mode));document.getElementById('archetypes-grid').style.display=mode==='cible'?'flex':'none';document.getElementById('info-aleatoire').classList.toggle('visible',mode==='aleatoire');if(mode!=='cible')selectedArchetype=null}
+function selectMode(mode){
+  selectedMode=mode;
+  ['cible','aleatoire','progression'].forEach(m=>{
+    const el=document.getElementById('mode-'+m);
+    if(el)el.classList.toggle('selected',m===mode);
+  });
+  document.getElementById('archetypes-grid').style.display=mode==='cible'?'flex':'none';
+  document.getElementById('info-aleatoire').classList.toggle('visible',mode==='aleatoire');
+  const infoProg=document.getElementById('info-progression');
+  if(mode==='progression'){
+    infoProg.style.display='block';
+    infoProg.classList.add('visible');
+    afficherAnalyseProgression();
+  } else {
+    infoProg.style.display='none';
+    infoProg.classList.remove('visible');
+  }
+  if(mode!=='cible')selectedArchetype=null;
+}
+
+function afficherAnalyseProgression(){
+  const hist=getHistory();
+  const el=document.getElementById('progression-analyse');
+  if(hist.length<2){
+    el.innerHTML=`<p style="font-size:13px;color:var(--ink2);line-height:1.7"><strong>Pas encore assez de données.</strong><br>Faites au moins 2 simulations en mode Ciblé ou Aléatoire pour activer le mode Progression.</p>`;
+    return;
+  }
+  const analyse=analyserProgression();
+  const arch=ARCHETYPES[analyse.archetype];
+  const hist3=hist.slice(0,Math.min(5,hist.length));
+  const dejaFait=hist3.map(h=>h.scenario).join(', ');
+  el.innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:6px">Analyse de vos ${hist.length} session(s)</div>
+      <div style="font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:10px">
+        Votre point le plus faible : <strong style="color:var(--red)">${analyse.competenceLabel}</strong> (score moyen : ${analyse.scoreMoyen}/100).<br>
+        ${analyse.explication}
+      </div>
+    </div>
+    <div style="background:var(--accent-soft);border:1px solid rgba(37,99,235,.2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Prospect sélectionné automatiquement</div>
+      <div style="font-size:14px;font-weight:600;color:var(--ink)">${arch.icon} ${arch.nom}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">${arch.description}</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.6">
+      <strong>Scénarios récents :</strong> ${dejaFait}<br>
+      Le mode Progression évite de répéter les mêmes archétypes consécutivement.
+    </div>`;
+}
+
+function analyserProgression(){
+  const hist=getHistory();
+  // Moyennes par compétence sur les 10 dernières sessions
+  const n=Math.min(10,hist.length);
+  const recent=hist.slice(0,n);
+  const moyennes={accroche:0,ecoute:0,argumentation:0,objections:0,closing:0};
+  recent.forEach(h=>{
+    if(h.scores){
+      Object.keys(moyennes).forEach(k=>{ if(h.scores[k]!==undefined)moyennes[k]+=h.scores[k]; });
+    }
+  });
+  Object.keys(moyennes).forEach(k=>moyennes[k]=Math.round(moyennes[k]/n));
+
+  // Trouver la compétence la plus faible
+  const plusFaible=Object.entries(moyennes).sort((a,b)=>a[1]-b[1])[0];
+  const competence=plusFaible[0],score=plusFaible[1];
+
+  // Mapping compétence → archétype + explication
+  const mapping={
+    accroche:{
+      archetype:'presse',
+      label:'Accroche',
+      explication:'Vous perdez le prospect dès le début. Le Pressé vous force à aller droit au but en moins de 30 secondes — c\'est l\'entraînement le plus efficace pour améliorer votre ouverture.'
+    },
+    ecoute:{
+      archetype:'indecis',
+      label:'Écoute',
+      explication:'Vous ne reformulez pas assez et manquez les signaux du prospect. L\'Indécis a besoin d\'être compris et rassuré — impossible à convaincre sans vraiment l\'écouter.'
+    },
+    argumentation:{
+      archetype:'comparateur',
+      label:'Argumentation',
+      explication:'Vos arguments manquent de précision et de différenciation. Le Comparateur vous pousse à chiffrer, prouver et vous démarquer clairement de la concurrence.'
+    },
+    objections:{
+      archetype:hist.slice(0,3).some(h=>h.scenario&&h.scenario.includes('Méfiant'))?'dominant':'mefiant',
+      label:'Gestion des objections',
+      explication:'Vous cédez trop vite ou évitez les objections. Le Méfiant vous confronte à des objections précises qui exigent des preuves concrètes — pas de vague possible.'
+    },
+    closing:{
+      archetype:'negociateur',
+      label:'Closing',
+      explication:'Vous n\'arrivez pas à conclure ou cédez sur le prix sans contrepartie. Le Négociateur vous force à tenir votre position et proposer une suite concrète.'
+    }
+  };
+
+  const m=mapping[competence];
+  // Éviter de répéter le même archétype que la dernière session
+  let archetypeFinal=m.archetype;
+  if(hist.length>0&&hist[0].scenario&&hist[0].scenario.includes(ARCHETYPES[m.archetype]?.nom)){
+    // Prendre le 2e plus faible
+    const second=Object.entries(moyennes).sort((a,b)=>a[1]-b[1])[1];
+    archetypeFinal=mapping[second[0]]?.archetype||m.archetype;
+  }
+
+  return{
+    archetype:archetypeFinal,
+    competence,
+    competenceLabel:m.label,
+    scoreMoyen:score,
+    explication:m.explication,
+    moyennes
+  };
+}
 function selectArchetype(key){selectedArchetype=key;Object.keys(ARCHETYPES).forEach(k=>document.getElementById('arch-'+k).classList.toggle('selected',k===key))}
 function genererPrenom(arch){const g=Math.random()>.5?'m':'f';const l=PRENOMS[arch][g];return l[Math.floor(Math.random()*l.length)]}
 
@@ -701,7 +815,8 @@ function lancerSimulation(){
   if(!selectedSituation){showToast("Choisissez un type d'appel.");return}
   if(!selectedMode){showToast('Choisissez un mode.');return}
   if(selectedMode==='cible'&&!selectedArchetype){showToast('Choisissez un archétype.');return}
-  const archetypeFinal=selectedMode==='aleatoire'?Object.keys(ARCHETYPES)[Math.floor(Math.random()*6)]:selectedArchetype;
+  if(selectedMode==='progression'&&getHistory().length<2){showToast('Faites au moins 2 simulations avant d\'utiliser ce mode.');return}
+  const archetypeFinal=selectedMode==='aleatoire'?Object.keys(ARCHETYPES)[Math.floor(Math.random()*6)]:selectedMode==='progression'?analyserProgression().archetype:selectedArchetype;
   const produit=(document.getElementById('input-produit').value||'').trim();
   const cible=(document.getElementById('input-cible').value||'').trim();
   const prenom=genererPrenom(archetypeFinal);
