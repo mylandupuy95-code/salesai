@@ -653,7 +653,7 @@ FAIBLESSE COMMERCIAL : ${arch.faiblesseCommercial}
 DÉCLENCHEUR : ${arch.declencheurPositif}
 RÉACTIONS VIDES : Signal: ${rv.signal} | Raccrochage: ${rv.raccroche} | Style: ${rv.style}
 NIVEAU : ${niv.instruction} ${niv.seuilVide}
-RÈGLES : 1) Mémoire totale 2) Évolution réelle selon qualité 3) Cohérence archétype 4) Langage humain — JAMAIS d'astérisques 5) FRANÇAIS UNIQUEMENT — Zéro mot anglais, zéro expression anglaise, même familière. "Quickly", "ok", "deal", "meeting" → tout en français. Orthographe et grammaire irréprochables.
+RÈGLES : 1) Mémoire totale 2) Évolution réelle selon qualité 3) Cohérence archétype 4) Langage humain — JAMAIS d'astérisques 5) Français parfait
 FIN : Si objectif atteint → OBJECTIF ATTEINT: [une phrase] | Si raccroché → RACCROCHÉ: [raison courte] | Max 4 phrases par réponse.`
 }
 
@@ -781,7 +781,11 @@ function renderResults(d){
   let html=`<div class="rd-title">Débriefing expert</div><div class="rd-cols"><div><div class="rd-col-title g">✓ Ce qui a bien marché</div><div class="rd-list">${d.points_forts.map(p=>`<div class="rd-item"><span style="color:var(--green);margin-right:4px">+</span><span>${p}</span></div>`).join('')}</div></div><div><div class="rd-col-title r">✗ Erreurs à corriger</div><div class="rd-list">${d.erreurs.map(p=>`<div class="rd-item"><span style="color:var(--red);margin-right:4px">−</span><span>${p}</span></div>`).join('')}</div></div></div><div class="prospect-voice"><div class="pv-label">Ce que ${current.prospect.name} aurait pensé</div><div class="pv-text">"${d.pensee_prospect}"</div></div><div class="conseil-box"><div class="conseil-label">Conseil prioritaire</div><div class="conseil-text">${d.conseil}</div></div>`;
   if(d.vs_humain)html+=`<div class="human-section" style="margin-top:20px"><div class="human-title">Face à un vrai humain — ce qui serait différent</div><div class="human-intro">${d.vs_humain.intro}</div><div class="human-diff">${d.vs_humain.differences.map(x=>`<div class="hd-item"><span style="margin-right:8px">⚠</span><span>${x}</span></div>`).join('')}</div></div>`;
   const refs=(d.reformulations||[]).filter(r=>r&&r.dit&&r.dit!=='null'&&r.aurait_du);
-  if(refs.length>0){html+=`<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="rd-title">Ce que vous auriez pu dire</div>${refs.map((r,idx)=>{let ci=-1;const cc=conversation.filter(m=>!m.content.startsWith('DEBUT_SIMULATION'));for(let i=0;i<cc.length;i++){if(cc[i].role==='user'&&cc[i].content.indexOf(r.dit.substring(0,20))>=0){ci=i+1;break}}if(ci<0)ci=Math.max(1,cc.length-(refs.length-idx)*2);return`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px">Vous avez dit</div><div style="font-size:13px;color:var(--ink2);font-style:italic;margin-bottom:10px;padding:10px 14px;background:var(--red-soft);border-left:2px solid var(--red);border-radius:0 var(--r) var(--r) 0">"${r.dit}"</div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:5px">À la place</div><div style="font-size:13px;color:var(--ink);padding:10px 14px;background:var(--green-soft);border-left:2px solid var(--green);border-radius:0 var(--r) var(--r) 0">"${r.aurait_du}"</div><button class="replay-btn" onclick="openReplayModal(${JSON.stringify(r.dit)},${JSON.stringify(r.aurait_du)},${ci})">↺ Rejouer ce moment</button></div>`}).join('')}</div>`}
+  if(refs.length>0){html+=`<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="rd-title">Ce que vous auriez pu dire</div>${refs.map((r,idx)=>{
+    const cc=conversation.filter(m=>!m.content.startsWith('DEBUT_SIMULATION'));
+    let ci=cc.length; // par défaut à la fin
+    for(let i=0;i<cc.length;i++){if(cc[i].role==='user'&&cc[i].content.includes(r.dit.substring(0,15))){ci=i;break}}
+    return`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:5px">Vous avez dit</div><div style="font-size:13px;color:var(--ink2);font-style:italic;margin-bottom:10px;padding:10px 14px;background:var(--red-soft);border-left:2px solid var(--red);border-radius:0 var(--r) var(--r) 0">"${r.dit}"</div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:5px">À la place</div><div style="font-size:13px;color:var(--ink);padding:10px 14px;background:var(--green-soft);border-left:2px solid var(--green);border-radius:0 var(--r) var(--r) 0">"${r.aurait_du}"</div><button class="replay-btn" onclick="openReplayModal(${JSON.stringify(r.dit)},${JSON.stringify(r.aurait_du)},${ci})">↺ Rejouer ce moment</button></div>`}).join('')}</div>`}
   const ct=conversation.filter(m=>!m.content.startsWith('DEBUT_SIMULATION')).map(m=>({role:m.role,text:m.content.split('[Interne:')[0].trim()})).filter(m=>m.text.length>0);
   if(ct.length>0){html+=`<div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"><div class="rd-title">Replay de la conversation</div>${ct.map(m=>{const iu=m.role==='user',name=iu?'Vous':current.prospect.name,bg=iu?'var(--accent-soft)':'var(--s1)',bc=iu?'var(--accent)':'var(--border2)',nc=iu?'var(--accent)':'var(--muted)';return`<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${nc};margin-bottom:3px">${name}</div><div style="font-size:13px;line-height:1.7;color:var(--ink2);padding:10px 14px;background:${bg};border-left:2px solid ${bc};border-radius:0 var(--r) var(--r) 0">${m.text}</div></div>`}).join('')}</div>`}
   document.getElementById('res-detail').innerHTML=html;
@@ -791,7 +795,41 @@ function renderResults(d){
 
 function openReplayModal(e,s,i){replayFromIndex=i;document.getElementById('replay-context-msg').textContent=e;document.getElementById('replay-suggestion').textContent=s;document.getElementById('replay-textarea').value=s;document.getElementById('replay-modal').classList.add('visible');setTimeout(()=>{const ta=document.getElementById('replay-textarea');ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)},100)}
 function closeReplayModal(){document.getElementById('replay-modal').classList.remove('visible')}
-async function submitReplay(){const ut=(document.getElementById('replay-textarea').value||'').trim();if(!ut)return;closeReplayModal();if(replayFromIndex>=0&&replayFromIndex<conversation.length)conversation=conversation.slice(0,replayFromIndex);msgCount=Math.max(0,msgCount-1);show('sim');addSys('Replay — vous reformulez à partir de ce moment');document.getElementById('btn-send').disabled=false;const txt=document.getElementById('txt');txt.disabled=false;txt.placeholder='Répondez naturellement...';txt.value=ut;await send()}
+async function submitReplay(){
+  const ut=(document.getElementById('replay-textarea').value||'').trim();
+  if(!ut)return;
+  closeReplayModal();
+  if(replayFromIndex>=0&&replayFromIndex<conversation.length){
+    conversation=conversation.slice(0,replayFromIndex);
+  }
+  msgCount=Math.max(0,conversation.filter(m=>m.role==='user'&&!m.content.startsWith('DEBUT_SIMULATION')).length);
+  weakResponseCount=0;
+  show('sim');
+  if(!timerInterval)startTimer();
+  addSys('Replay — vous reformulez à partir de ce moment');
+  updateCounter();
+  const btn=document.getElementById('btn-send'),txt=document.getElementById('txt');
+  btn.disabled=false;txt.disabled=false;txt.style.opacity='1';txt.placeholder='Répondez naturellement...';txt.value='';
+  addMsg(ut,'u');
+  msgCount++;updateCounter();
+  const qualite=evaluerQualiteMessage(ut);
+  if(qualite==='vide'||qualite==='faible')weakResponseCount++;else weakResponseCount=Math.max(0,weakResponseCount-1);
+  showTyping();
+  const msgNote=ut+`\n\n[Interne: reprise replay. Échange ${msgCount}/${MAX_EXCHANGES}. Commercial reformule mieux. Réagis positivement si c'est bon. 3-4 phrases max.]`;
+  conversation.push({role:'user',content:msgNote});
+  try{
+    const reply=await callAPI(conversation,current.systemPrompt);
+    removeTyping();
+    const raccroche=reply.includes('RACCROCHÉ')||reply.includes('RACCROCHE');
+    const objectif=reply.includes('OBJECTIF ATTEINT');
+    if(raccroche){const r=reply.replace(/RACCROCHÉ:|RACCROCHE:/g,'').replace(/RACCROCHÉ|RACCROCHE/g,'').trim();addMsg(r,'p');conversation.push({role:'assistant',content:reply});disableInput();setTimeout(()=>triggerCallEnd('lost',r),1500);return}
+    if(objectif){const r=reply.replace(/OBJECTIF ATTEINT:/g,'').replace(/OBJECTIF ATTEINT/g,'').trim();addMsg(r,'p');conversation.push({role:'assistant',content:reply});disableInput();setTimeout(()=>triggerCallEnd('won',r),1500);return}
+    addMsg(reply,'p');conversation.push({role:'assistant',content:reply});
+    btn.disabled=false;txt.focus();
+  }catch(e){
+    removeTyping();const err="Désolé, j'ai une urgence. Je reviens.";addMsg(err,'p');conversation.push({role:'assistant',content:err});btn.disabled=false;
+  }
+}
 function replayScenario(){if(!currentConfig){show('home');goStep1();return}currentConfig.prenom=genererPrenom(currentConfig.archetype);const arch=ARCHETYPES[currentConfig.archetype],sit=SITUATIONS[currentConfig.situation];current={name:sit.nom+' — '+arch.nom,prospect:{name:currentConfig.prenom,role:arch.nom+' · '+currentConfig.cible,av:currentConfig.prenom.substring(0,2).toUpperCase()},brief:[{k:'Produit',v:currentConfig.produit},{k:'Cible',v:currentConfig.cible},{k:'Situation',v:sit.nom},{k:'Archétype',v:arch.nom},{k:'Déclencheur',v:arch.declencheurPositif}],tips:['Faiblesse : '+arch.faiblesseCommercial,'Déclencheur : '+arch.declencheurPositif,sit.contexte],systemPrompt:genererSystemPrompt(currentConfig)};conversation=[];msgCount=0;weakResponseCount=0;document.getElementById('sim-title').textContent=current.name;document.getElementById('sim-av').textContent=current.prospect.av;document.getElementById('sim-name').textContent=current.prospect.name;document.getElementById('sim-role').textContent=current.prospect.role;document.getElementById('chat-log').innerHTML='';renderBrief();renderTips();updateCounter();const txt=document.getElementById('txt'),btn=document.getElementById('btn-send');txt.disabled=false;txt.value='';txt.placeholder='Répondez naturellement...';btn.disabled=false;show('sim');startTimer();addSys('Nouvelle tentative — '+current.name);prospectFirst()}
 async function submitEmail(){const prenom=(document.getElementById('email-prenom').value||'').trim(),email=(document.getElementById('email-addr').value||'').trim();if(!email||!email.includes('@')){showToast('Entrez un email valide.');return}try{await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'brevo',email,prenom})})}catch(e){}document.getElementById('email-sent').classList.add('visible');document.getElementById('email-capture').style.borderTopColor='var(--green)'}
 function getHistory(){try{return JSON.parse(localStorage.getItem('salesai_history')||'[]')}catch{return[]}}
