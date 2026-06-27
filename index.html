@@ -859,10 +859,32 @@ async function prospectFirst(){
 
 function evaluerQualiteMessage(txt){
   const t=txt.toLowerCase().trim();
-  const vides=['ok','okay','oui','non','bien','parfait','absolument','exactement','bien sûr','bien sur',"d'accord",'dacord','compris','entendu','je vois','je comprends','pas de problème','pas de probleme','super','génial','genial','merci','pardon','désolé','desole','effectivement','tout à fait','tout a fait','voilà','voila',"c'est ça","c'est ca",'exact'];
   const c=t.replace(/[.!?,]/g,'').trim();
+
+  // Niveau 1 : réponses vides classiques
+  const vides=['ok','okay','oui','non','bien','parfait','absolument','exactement','bien sûr','bien sur',"d'accord",'dacord','compris','entendu','je vois','je comprends','pas de problème','pas de probleme','super','génial','genial','merci','pardon','désolé','desole','effectivement','tout à fait','tout a fait','voilà','voila',"c'est ça","c'est ca",'exact'];
   if(vides.includes(c))return'vide';
-  if(txt.length<25&&!txt.includes('?')&&!/\d/.test(txt)&&txt.length<=40&&!/rdv|rendez-vous|proposition|rappel|semaine|démo|demo|essai|gratuit|offre/.test(t))return'faible';
+
+  // Niveau 2 : formules de transition / politesse SANS substance
+  const transitionsVides=[
+    /^(d'accord|dacord)[, ]*(je vous explique|commençons|alors|donc)?[.!]*$/,
+    /^(alors|donc|bon|bah|ba)[, ]+(je vous explique|voilà|écoutez)?[.!]*$/,
+    /^(je commence|excusez?[ -]?moi|pardon)[, ]*(comment vous appelez[ -]vous|qui êtes[ -]vous)?[.!?]*$/,
+    /^(a|ah)[, ]?(oui|ok|bon|d'accord)?[.!]*$/,
+    /^non[, ]?(je ne|pardon|désolé)/,
+    /^(je comprends|je vois|je note)[.!]*$/
+  ];
+  if(transitionsVides.some(re=>re.test(t)))return'faible';
+
+  // Niveau 3 : signal de contenu réel (chiffre, mot-clé produit, ou question construite)
+  const aChiffre = /\d/.test(t);
+  const aMotCle = /rdv|rendez-vous|proposition|rappel|semaine|démo|demo|essai|gratuit|offre|garantie|tarif|prix|euro|€|vitesse|débit|qualité|service|engagement|contrat|installation|technicien|avantage|économie|réduction/.test(t);
+  const aQuestionPrecise = /\?/.test(t) && txt.length>=15;
+
+  if(!aChiffre && !aMotCle && !aQuestionPrecise){
+    if(txt.length<60)return'faible';
+  }
+
   return'bon'
 }
 
